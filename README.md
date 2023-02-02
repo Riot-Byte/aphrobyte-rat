@@ -1,7 +1,7 @@
 # RIOT RAT
 > A powerful Remote Access Trojan that uses Discord as C2. This means you can control your devices through Discord.
 
-This RAT is still in development as more modules and features are being added to it. If you want to be notified when we do an update, join this Discord server :
+This RAT is still in development and not out yet, as more modules and features are being added to it. If you want to be notified when we do an update, join this Discord server :
 ## https://discord.gg/R5ab7AXpJu
 
 ## Current features
