@@ -1,4 +1,5 @@
-# RIOT RAT
+![aphrobytelogo](https://user-images.githubusercontent.com/71534600/216463962-fa72bec6-c7b1-417e-9c1f-116346961b52.png)
+# Aphrobyte RAT
 > A powerful Remote Access Trojan that uses Discord as C2. This means you can control your devices through Discord.
 
 This RAT is still in development and not out yet, as more modules and features are being added to it. If you want to be notified when we do an update, join this Discord server :
