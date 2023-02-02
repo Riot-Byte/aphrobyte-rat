@@ -6,13 +6,12 @@ This RAT is still in development and not out yet, as more modules and features a
 
 ## Current features
 
-- Surveillance commands
-- Fun commands
+- Surveillance modules
+- Fun modules
 - Sanctioning
-- Fun
 - Communication (chats with the infected user)
 - Multiple agent handling (get multiple people at once)
 - Persistence
-- File management commands
+- File management modules
 
 ## Donations : **bc1q9fgyzkz6qang8gvaajac2fkqrp9dp3w2hnettk**
