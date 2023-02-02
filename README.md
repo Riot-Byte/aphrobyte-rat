@@ -14,5 +14,6 @@ This RAT is still in development and not out yet, as more modules and features a
 - Multiple agent handling (get multiple people at once)
 - Persistence
 - File management modules
+- Information gathering
 
 ## Donations : **bc1q9fgyzkz6qang8gvaajac2fkqrp9dp3w2hnettk**
