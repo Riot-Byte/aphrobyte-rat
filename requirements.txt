@@ -1,5 +1,5 @@
+opencv-python
 pyautogui
-pygame
 discord
 psutil
 rotate-screen
