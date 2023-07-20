@@ -2,7 +2,7 @@
 # Aphrobyte RAT
 > A powerful Remote Administration Tool that uses Discord as C2. This means you can control your devices through Discord.
 
-Support server : https://discord.gg/R5ab7AXpJu
+Support server : [https://discord.gg/R5ab7AXpJu](https://discord.gg/4TyqkDXtBa)
 
 ## Installation
 You can install the tool from [the latest release](https://github.com/Riot-Byte/aphrobyte-rat/releases/tag/Latest).
@@ -17,7 +17,6 @@ You can install the tool from [the latest release](https://github.com/Riot-Byte/
 - Persistence
 - File management modules
 - Information gathering
-- Undetected by antivirus
 
 ## Disclaimer
 This tool was made for educational purposes only and self learning. The developer is not responsible for bad actions that originate from this tool.
