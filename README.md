@@ -1,6 +1,6 @@
 ![aphrobytelogo](https://user-images.githubusercontent.com/71534600/216463962-fa72bec6-c7b1-417e-9c1f-116346961b52.png)
 # Aphrobyte RAT
-> A powerful Remote Administration Tool that uses Discord as C2. This means you can control your devices through Discord.
+> A Remote Administration Tool that uses Discord as C2. This means you can control your devices through Discord.
 
 Support server : [https://discord.gg/R5ab7AXpJu](https://discord.gg/4TyqkDXtBa)
 
