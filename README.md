@@ -5,7 +5,7 @@
 Support server : [https://discord.gg/R5ab7AXpJu](https://discord.gg/4TyqkDXtBa)
 
 ## Installation
-You can install the tool from [the latest release](https://github.com/Riot-Byte/aphrobyte-rat/releases/tag/Latest).
+You can install the tool from [the latest release](https://github.com/Riot-Byte/aphrobyte-rat/releases/tag/v1.9.1).
 
 ## Current features
 
