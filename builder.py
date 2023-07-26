@@ -1,5 +1,15 @@
 import sys, os, shutil
-from termcolor import colored
+try:
+    from termcolor import colored
+    import colorama
+except:
+    os.system("pip install termcolor")
+    os.system("pip install colorama")
+    from termcolor import colored
+    import colorama
+
+colorama.init()
+
 ####################################################
 
 samplefile = ".buildmodules\sample.py"
