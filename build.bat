@@ -1,1 +1,2 @@
-python3 builder.py
+python builder.py
+pause
