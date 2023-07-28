@@ -50,6 +50,7 @@ def pause():
     os.system("pause")  
 def clear():
     os.system("cls")    
+    
 ascii_art = """
 
 ░█████╗░██████╗░██╗░░██╗██████╗░░█████╗░██████╗░██╗░░░██╗████████╗███████╗
