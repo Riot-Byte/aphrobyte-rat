@@ -1,0 +1,14 @@
+opencv-python
+requests
+colorama
+termcolor
+pyautogui
+discord
+psutil
+rotate-screen
+pypiwin32
+pyperclip
+tk
+browser_cookie3
+urllib3
+pillow
