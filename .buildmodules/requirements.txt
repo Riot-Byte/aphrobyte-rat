@@ -1,6 +1,7 @@
 opencv-python
 requests
 colorama
+PyInstaller
 termcolor
 pyautogui
 discord
