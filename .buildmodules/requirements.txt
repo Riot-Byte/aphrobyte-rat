@@ -15,3 +15,5 @@ tk
 browser_cookie3
 urllib3
 pillow
+playsound
+gtts

