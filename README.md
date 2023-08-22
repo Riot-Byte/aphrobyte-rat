@@ -23,4 +23,4 @@ You can install the tool from [the latest release](https://github.com/Riot-Byte/
 This tool was made for educational purposes only and self learning. The developer is not responsible for bad actions that originate from this tool.
 Publishing this tool under your name will result in a DMCA takedown.
 
-## Donations : **bc1q9fgyzkz6qang8gvaajac2fkqrp9dp3w2hnettk**
+## Donations : **bc1qzx8ex62q8ujs5ea62vkjfrye3khqtmdepgaxen**
