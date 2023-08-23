@@ -3,6 +3,7 @@ from discord.ext import commands
 from PIL import Image
 from gtts import gTTS
 from ctypes import Structure, windll, c_uint, sizeof, byref
+from re import findall
 
 client = commands.Bot(command_prefix='!',intents=discord.Intents.all())
 client.remove_command("help")
