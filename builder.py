@@ -1,17 +1,20 @@
-import tkinter as tk, os, shutil
+import tkinter as tk, os, shutil, subprocess
+
+import builderassets.compile as compiler
+import builderassets.requirements as requirements
+
 from time import sleep
 from tkinter import ttk
-try: 
-    from PIL import Image, ImageTk
-except: 
-    os.system("pip install Pillow")
-    os.system("python builder.py")
+from PIL import Image, ImageTk
 
 buildstarted = False
 
 def build_bot(anti_vm_variable, autostartup_variable):
     global buildstarted
     if buildstarted != True:
+
+        if os.path.exists("builderassets\\__pycache__"):
+            shutil.rmtree("builderassets\\__pycache__")
 
         bot_token = textbox1.get()
         guild_id = textbox2.get()
@@ -59,7 +62,7 @@ def build_bot(anti_vm_variable, autostartup_variable):
 
         sleep(1)
 
-        os.system('PyInstaller --onefile --noconsole --icon=".buildmodules\\exeic.ico" --name="Client-built" .buildmodules\\main.py')
+        compiler.compile()
 
         if os.path.exists("build"):
             shutil.rmtree("build")
@@ -68,10 +71,10 @@ def build_bot(anti_vm_variable, autostartup_variable):
             shutil.rmtree("dist")
         if os.path.exists("Client-built.spec"):
             os.remove("Client-built.spec")
-        
+        if os.path.exists("builderassets\\__pycache__"):
+            shutil.rmtree("builderassets\\__pycache__")
+
         build_button.config(text="BUILD")
-        
-        buildstarted = False
     else:
         buildstarted = False
         if os.path.exists("build"):
@@ -81,10 +84,12 @@ def build_bot(anti_vm_variable, autostartup_variable):
         if os.path.exists("Client-built.spec"):
             os.remove("Client-built.spec")
         build_button.configure(text="BUILD")
+        if os.path.exists("builderassets\\__pycache__"):
+            shutil.rmtree("builderassets\\__pycache__")
 
 def installreq():
     installreq_button.config(text="INSTALLING REQUIREMENTS")
-    os.system("pip install -r .buildmodules\\requirements.txt")
+    requirements.install()
     installreq_button.config(text="INSTALL REQUIREMENTS")
 
 root = tk.Tk()
