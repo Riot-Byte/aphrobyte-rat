@@ -13,6 +13,7 @@ def build_bot(anti_vm_variable, autostartup_variable):
     global buildstarted
     if buildstarted != True:
 
+
         if os.path.exists("builderassets\\__pycache__"):
             shutil.rmtree("builderassets\\__pycache__")
 
@@ -26,7 +27,7 @@ def build_bot(anti_vm_variable, autostartup_variable):
             return
 
         buildstarted = True
-        build_button.config(text="BUILDING")
+        
 
         if str(anti_vm_variable) == "PY_VAR0":
             anti_vm_variable = False
@@ -62,19 +63,9 @@ def build_bot(anti_vm_variable, autostartup_variable):
 
         sleep(1)
 
+        compiler.build_button = build_button
         compiler.compile()
 
-        if os.path.exists("build"):
-            shutil.rmtree("build")
-        if os.path.exists("dist"):
-            shutil.copy("dist\\Client-built.exe", "Client-built.exe")
-            shutil.rmtree("dist")
-        if os.path.exists("Client-built.spec"):
-            os.remove("Client-built.spec")
-        if os.path.exists("builderassets\\__pycache__"):
-            shutil.rmtree("builderassets\\__pycache__")
-
-        build_button.config(text="BUILD")
     else:
         buildstarted = False
         if os.path.exists("build"):
@@ -88,12 +79,11 @@ def build_bot(anti_vm_variable, autostartup_variable):
             shutil.rmtree("builderassets\\__pycache__")
 
 def installreq():
-    installreq_button.config(text="INSTALLING REQUIREMENTS")
+    requirements.installreq_button = installreq_button
     requirements.install()
-    installreq_button.config(text="INSTALL REQUIREMENTS")
 
 root = tk.Tk()
-root.title("Aphrobyte @ RIOT Administration")
+root.title("Aphrobyte | @ RIOT Administration")
 root.geometry("400x470")
 root.configure(background="#333")
 
