@@ -17,7 +17,7 @@ You can install the tool from [the latest release](https://github.com/Riot-Byte/
 - Persistence
 - File management modules
 - Information gathering
-- Undetected by antivirus
+- Undetected by antivirus (sorry not anymore)
 
 ## Disclaimer
 This tool was made for educational purposes only and self learning. The developer is not responsible for bad actions that originate from this tool.
