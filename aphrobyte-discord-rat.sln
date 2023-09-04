@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33829.357
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "aphrobyte-discord-rat", "aphrobyte-discord-rat.csproj", "{C04A8F04-BAA4-4743-BDE2-F042DB0BE037}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C04A8F04-BAA4-4743-BDE2-F042DB0BE037}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C04A8F04-BAA4-4743-BDE2-F042DB0BE037}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C04A8F04-BAA4-4743-BDE2-F042DB0BE037}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C04A8F04-BAA4-4743-BDE2-F042DB0BE037}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FA0C6F5F-AD52-49AD-8007-0C1B321870E1}
+	EndGlobalSection
+EndGlobal
