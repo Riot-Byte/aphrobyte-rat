@@ -1,9 +1,10 @@
+PyInstaller
 opencv-python
 requests
 colorama
 termcolor
+pycryptodome
 pyautogui
-PyInstaller
 discord
 psutil
 rotate-screen
