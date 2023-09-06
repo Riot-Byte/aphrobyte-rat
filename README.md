@@ -57,6 +57,44 @@ You can install the tool from [the latest release](https://github.com/Riot-Byte/
 - **!grabroblox** - Grabs the user's Roblox account cookie.
 - **!hardware_list** - Lists the user's hardware on newlines.
 
+  **!grabdiscord** - Fetches the user's Discord account token.
+
+### Sanctioning
+
+- **!bsod** - Blue screens the computer.
+- **!disabletaskmgr** \ **!enabletaskmanager** - Disable/enable task manager.
+- **!logoff** - Logs the user off.
+- **!shutdown** - Shuts the user's PC off.
+- **!restart** - Restarts the user's PC.
+- **!blockscreen** - Blocks the user's screen. (IRREVERSIBLE UNTIL USER RESTARTS)
+- **!critproc** - Makes the RAT a critical process, meaning if it's task killed the user will get a BSOD.
+- **!screenflip** - Rotates the user's screen 90 degrees.
+
+### Fun
+
+- **!write** - Writes a sentence then presses enter.
+- **!setclipboard** - Sets the clipboard to the specified string of text.
+- **!forcedesktop** - Sends the user on desktop automatically.
+- **!messmouse** - Shakes the user's cursor when they try to move the mouse, run this command again to stop.
+- **!opensite** - Opens a site on the user's browser.
+- **!key_press** - Press a key.
+- **!showtaskbar** \ **!hidetaskbar**
+- **!tts (text)** - Text to speech.
+
+### Communication
+
+- **!questionmsg** - Sends the user a question message.
+- **!warningmsg** - Sends the user a warning message.
+- **!errormsg** - Sends the user an error message.
+- **!infomsg** - Sends the user an informative message.
+
+```
+* You need to specify the usage ID after every command. Arguments come after. The usage ID will be sent at the start of every session.
+
+Example : !write (usage-id) (sentence) => !write 123456 Test sentence
+          !questionmsg (usage-id) (message) => !questionmsg 123456 Test message
+```
+
 ## Disclaimer
 This tool was made for educational purposes only and self learning. The developer is not responsible for bad actions that originate from this tool.
 Publishing this tool under your name will result in a DMCA takedown.
