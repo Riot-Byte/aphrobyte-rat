@@ -2,6 +2,30 @@
 # Aphrobyte RAT
 > A powerful Remote Access Trojan that uses Discord as C2. This means you can control your devices through Discord.
 
+> Aphrobyte Plus is also a thing, which along side the current features, also has the following in addition :
+- Screamer
+- Shell commands
+- Better file management with creating and writing modules
+- Live microphone streaming in VC
+- Mouse swap and unswap (improved mouse hold too)
+- Manage the volume
+- Grabs passwords from every browser and every user profile for that browser, grabs history, cookies, and steam accounts
+- Block/unblock websites :shield:
+- Desktop flooding
+- PC lagging modules
+- Anti VM/sandbox/debug ofcourse
+- Play audio
+- Keylogger
+- Epilepsy command, emits GDI effects
+- Able to overwrite MBR :shield:
+- Disable defender :shield:
+- USB spread
+- UAC Bypass
+- Backdoor adds itself to AV exclusions
+- Crypto clipper (BTC, ETH, LTC, XMR)
+  
+> Aphrobyte Plus can be purchased within the support server.
+
 Support server : https://discord.gg/R5ab7AXpJu
 
 ## Installation
