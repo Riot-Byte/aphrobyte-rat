@@ -103,7 +103,6 @@ You can install the tool from [the latest release](https://github.com/Riot-Byte/
 - **!opensite** - Opens a site on the user's browser.
 - **!key_press** - Press a key.
 - **!showtaskbar** \ **!hidetaskbar**
-- **!tts (text)** - Text to speech.
 
 ### Communication
 
