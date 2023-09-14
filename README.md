@@ -26,7 +26,7 @@
   
 > Aphrobyte Plus can be purchased within the support server.
 
-Support server : https://discord.gg/R5ab7AXpJu
+Support server : https://discord.gg/8jQjUVchp8
 
 ## Installation
 You can install the tool from [the latest release](https://github.com/Riot-Byte/aphrobyte-rat/releases/tag/v1.9.2).
