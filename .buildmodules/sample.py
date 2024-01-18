@@ -4,7 +4,8 @@ from Crypto.Cipher import AES
 from ctypes import Structure, c_uint
 from re import findall
 
-client = commands.Bot(command_prefix='!',intents=discord.Intents.all())
+intents = discord.Intents.all()
+client = commands.Bot(command_prefix='!', intents=intents)
 client.remove_command("help")
 
 ### CONFIGURATION
