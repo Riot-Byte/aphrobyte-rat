@@ -4,7 +4,6 @@
 
 # Aphrobyte Plus: https://rentry.co/aphrobyteplus-trojan
 
-Support server : https://discord.gg/8jQjUVchp8
 Telegram : https://t.me/riotadministration
 
 ## Installation
